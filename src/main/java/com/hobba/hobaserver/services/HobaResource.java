@@ -17,10 +17,12 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.persistence.EntityManager;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.Consumes;
@@ -76,7 +78,8 @@ public class HobaResource {
             @FormParam("kidtype") String kidType,
             @FormParam("kid") String kid,
             @FormParam("didtype") String didType,
-            @FormParam("did") String did
+            @FormParam("did") String did,
+            @Context HttpServletRequest request
     ) {
         HobaKeys hk = new HobaKeys();
         HobaDevices hd = new HobaDevices();
@@ -99,6 +102,8 @@ public class HobaResource {
             hd.setDid(did);
             hd.setDidtype(didType);
             hd.setIduser(hu);
+            hd.setLastDate(new Date());
+            hd.setIpAddress(request.getRemoteAddr());
             hd = hdfrest.create(hd);
         } catch (Exception e) {
             System.out.println("user exists2");
@@ -145,7 +150,7 @@ public class HobaResource {
     @Path("auth")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    public Response athenticateUA(@FormParam("kid") String kid, @FormParam("signature") String signature) {
+    public Response athenticateUA(@FormParam("kid") String kid, @FormParam("signature") String signature,@Context HttpServletRequest request) {
         HobaKeys hk = new HobaKeys();
         HobaKeysFacadeREST hkfrest = new HobaKeysFacadeREST();
         hk = hkfrest.findHKIDbyKID(kid);
@@ -166,7 +171,12 @@ public class HobaResource {
             byte[] sign = Util.hexStringToByteArray(signature);
             byte[] chalenge = hc.getChalenge().getBytes();
             boolean verify = Util.verifySign(publicKey, sign, chalenge);
+            HobaDevices hd = hk.getIdDevices();
             if (verify) {
+                hd.setIpAddress(request.getRemoteAddr());
+                hd.setLastDate(new Date());
+                HobaDevicesFacadeREST  hdfrest = new HobaDevicesFacadeREST();
+                hdfrest.create(hd);
                 return Response.status(Response.Status.OK).build();
             }
         } catch (Exception e) {
@@ -205,6 +215,7 @@ public class HobaResource {
     @POST
     @Produces(MediaType.TEXT_PLAIN)
     public Response authToken(@FormParam("token") String token, @FormParam("kid") String kid) {
+        em.getEntityManagerFactory().getCache().evictAll();
         byte[] decodedToken = Base64.decodeBase64(token.getBytes());
         String decodedTokenString = new String(decodedToken);
         System.out.println("decoded: " + decodedTokenString);
@@ -248,7 +259,10 @@ public class HobaResource {
         System.out.println("hu: " + hds.size());
         StringBuffer buffer = new StringBuffer();
         for (HobaDevices hd : hds) {
-            buffer.append(hd.getDidtype());
+            buffer.append(hd.getDidtype()).append("?");
+            buffer.append(hd.getIpAddress()).append("?");
+            
+            buffer.append(hd.getLastDate());
             buffer.append("*");
         }
 

@@ -6,7 +6,7 @@
 package com.hobba.hobaserver.services;
 
 import java.io.Serializable;
-import java.util.Collection;
+import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -17,12 +17,11 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
-import org.codehaus.jackson.annotate.JsonIgnore;
 
 /**
  *
@@ -35,7 +34,9 @@ import org.codehaus.jackson.annotate.JsonIgnore;
     @NamedQuery(name = "HobaDevices.findAll", query = "SELECT h FROM HobaDevices h"),
     @NamedQuery(name = "HobaDevices.findByIdDevices", query = "SELECT h FROM HobaDevices h WHERE h.idDevices = :idDevices"),
     @NamedQuery(name = "HobaDevices.findByDid", query = "SELECT h FROM HobaDevices h WHERE h.did = :did"),
-    @NamedQuery(name = "HobaDevices.findByDidtype", query = "SELECT h FROM HobaDevices h WHERE h.didtype = :didtype")})
+    @NamedQuery(name = "HobaDevices.findByDidtype", query = "SELECT h FROM HobaDevices h WHERE h.didtype = :didtype"),
+    @NamedQuery(name = "HobaDevices.findByIpAddress", query = "SELECT h FROM HobaDevices h WHERE h.ipAddress = :ipAddress"),
+    @NamedQuery(name = "HobaDevices.findByLastDate", query = "SELECT h FROM HobaDevices h WHERE h.lastDate = :lastDate")})
 public class HobaDevices implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
@@ -46,14 +47,18 @@ public class HobaDevices implements Serializable {
     @Size(max = 20)
     @Column(name = "did")
     private String did;
-    @Size(max = 40)
+    @Size(max = 200)
     @Column(name = "didtype")
     private String didtype;
+    @Size(max = 25)
+    @Column(name = "ip_address")
+    private String ipAddress;
+    @Column(name = "last_date")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date lastDate;
     @JoinColumn(name = "iduser", referencedColumnName = "id_user")
     @ManyToOne
     private HobaUser iduser;
-    @OneToMany(mappedBy = "idDevices")
-    private Collection<HobaKeys> hobaKeysCollection;
 
     public HobaDevices() {
     }
@@ -86,22 +91,28 @@ public class HobaDevices implements Serializable {
         this.didtype = didtype;
     }
 
+    public String getIpAddress() {
+        return ipAddress;
+    }
+
+    public void setIpAddress(String ipAddress) {
+        this.ipAddress = ipAddress;
+    }
+
+    public Date getLastDate() {
+        return lastDate;
+    }
+
+    public void setLastDate(Date lastDate) {
+        this.lastDate = lastDate;
+    }
+
     public HobaUser getIduser() {
         return iduser;
     }
 
     public void setIduser(HobaUser iduser) {
         this.iduser = iduser;
-    }
-
-    @XmlTransient
-    @JsonIgnore
-    public Collection<HobaKeys> getHobaKeysCollection() {
-        return hobaKeysCollection;
-    }
-
-    public void setHobaKeysCollection(Collection<HobaKeys> hobaKeysCollection) {
-        this.hobaKeysCollection = hobaKeysCollection;
     }
 
     @Override

@@ -36,8 +36,6 @@ import org.codehaus.jackson.annotate.JsonIgnore;
     @NamedQuery(name = "HobaUser.findByField2", query = "SELECT h FROM HobaUser h WHERE h.field2 = :field2"),
     @NamedQuery(name = "HobaUser.findByField3", query = "SELECT h FROM HobaUser h WHERE h.field3 = :field3")})
 public class HobaUser implements Serializable {
-    @OneToMany(mappedBy = "expiration")
-    private Collection<HobaToken> hobaTokenCollection;
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -55,6 +53,8 @@ public class HobaUser implements Serializable {
     private String field3;
     @OneToMany(mappedBy = "iduser")
     private Collection<HobaDevices> hobaDevicesCollection;
+    @OneToMany(mappedBy = "idUser")
+    private Collection<HobaToken> hobaTokenCollection;
 
     public HobaUser() {
     }
@@ -105,6 +105,16 @@ public class HobaUser implements Serializable {
         this.hobaDevicesCollection = hobaDevicesCollection;
     }
 
+    @XmlTransient
+    @JsonIgnore
+    public Collection<HobaToken> getHobaTokenCollection() {
+        return hobaTokenCollection;
+    }
+
+    public void setHobaTokenCollection(Collection<HobaToken> hobaTokenCollection) {
+        this.hobaTokenCollection = hobaTokenCollection;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -128,16 +138,6 @@ public class HobaUser implements Serializable {
     @Override
     public String toString() {
         return "com.hobba.hobaserver.services.HobaUser[ idUser=" + idUser + " ]";
-    }
-
-    @XmlTransient
-    @JsonIgnore
-    public Collection<HobaToken> getHobaTokenCollection() {
-        return hobaTokenCollection;
-    }
-
-    public void setHobaTokenCollection(Collection<HobaToken> hobaTokenCollection) {
-        this.hobaTokenCollection = hobaTokenCollection;
     }
     
 }

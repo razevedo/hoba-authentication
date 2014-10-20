@@ -48,7 +48,7 @@ public class HobaResource {
 
     @Context
     private UriInfo context;
-    
+
     private EntityManager em = getEntityManager();
 
     /**
@@ -122,14 +122,15 @@ public class HobaResource {
             System.out.println("user exists3");
             return Response.status(Response.Status.BAD_REQUEST).entity("USER_EXISTS").build();
         }
-
-        return Response.status(Response.Status.OK).entity("register").build();
+        
+        
+        return Response.status(Response.Status.OK).header("Hobareg-val", "regok").entity("register").build();
     }
 
     @Path("getchal")
     @POST
     @Produces(MediaType.TEXT_PLAIN)
-    public String getChalenge(@FormParam("kid") String kid) {
+    public Response getChalenge(@FormParam("kid") String kid) {
         HobaKeys hk = new HobaKeys();
         HobaKeysFacadeREST hkfrest = new HobaKeysFacadeREST();
         hk = hkfrest.findHKIDbyKID(kid);
@@ -144,19 +145,39 @@ public class HobaResource {
 
         HobaChalengesFacadeREST hcfrest = new HobaChalengesFacadeREST();
         hcfrest.create(hc);
-        return rand;
+        return Response.status(Response.Status.OK).header("Authentication", "HOBA").header("challenge", rand).header("max-age", 0).build();
+
     }
 
     @Path("auth")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    public Response athenticateUA(@FormParam("kid") String kid, @FormParam("signature") String signature,@Context HttpServletRequest request) {
+    public Response athenticateUA(@Context HttpServletRequest request) {
+
+        String header = request.getHeader("Authorized");
+        System.out.println("header: " + header);
+        String[] headerParams = header.split("[.]");
+        System.out.println("params: " + headerParams.length);
+        String kid = headerParams[0];
+        String chalenge = headerParams[1];
+        String nonce = headerParams[2];
+        String signBase64 = headerParams[3];
+        String alg = "1";
+        String origin = request.getRequestURL().toString();
+        origin = origin.split("/")[0] + "//" + origin.split("/")[2] + "/";
+
+        byte[] decodedToken = Base64.decodeBase64(signBase64.getBytes());
+        String decodedSign = new String(decodedToken);
+        System.out.println("signature: " + decodedSign);
+        String hobaTbs = nonce + " " + alg + " " + origin + " " + kid + " " + chalenge;
+
         HobaKeys hk = new HobaKeys();
         HobaKeysFacadeREST hkfrest = new HobaKeysFacadeREST();
+
         hk = hkfrest.findHKIDbyKID(kid);
         HobaChalenges hc = new HobaChalenges();
-        for (HobaChalenges chalenge : hk.getHobaChalengesCollection()) {
-            hc = chalenge;
+        for (HobaChalenges hb_chalenge : hk.getHobaChalengesCollection()) {
+            hc = hb_chalenge;
         }
 
         HobaChalengesFacadeREST hcfrest = new HobaChalengesFacadeREST();
@@ -168,14 +189,17 @@ public class HobaResource {
         try {
 
             byte[] publicKey = Util.hexStringToByteArray(hk.getPub());
-            byte[] sign = Util.hexStringToByteArray(signature);
-            byte[] chalenge = hc.getChalenge().getBytes();
-            boolean verify = Util.verifySign(publicKey, sign, chalenge);
+            byte[] sign = Util.hexStringToByteArray(decodedSign);
+            byte[] chalengeBytes = hobaTbs.getBytes();
+            System.out.println(hobaTbs);
+            System.out.println("len: "+hobaTbs.length());
+            boolean verify = Util.verifySign(publicKey, sign, chalengeBytes);
+            System.out.println("verify: "+verify);
             HobaDevices hd = hk.getIdDevices();
             if (verify) {
                 hd.setIpAddress(request.getRemoteAddr());
                 hd.setLastDate(new Date());
-                HobaDevicesFacadeREST  hdfrest = new HobaDevicesFacadeREST();
+                HobaDevicesFacadeREST hdfrest = new HobaDevicesFacadeREST();
                 hdfrest.create(hd);
                 return Response.status(Response.Status.OK).build();
             }
@@ -183,6 +207,7 @@ public class HobaResource {
             e.printStackTrace();
         }
         return Response.status(Response.Status.UNAUTHORIZED).build();
+
     }
 
     @Path("token")
@@ -200,7 +225,7 @@ public class HobaResource {
         HobaToken ht = new HobaToken();
         ht.setToken(rand);
 
-        ht.setIdUser(hu.getIdUser());
+        ht.setIdUser(hu);
 
         HobaTokenFacadeREST htfrest = new HobaTokenFacadeREST();
         ht = htfrest.create(ht);
@@ -230,9 +255,9 @@ public class HobaResource {
         HobaTokenFacadeREST htfrest = new HobaTokenFacadeREST();
         HobaToken ht = htfrest.findTokenbyToken(fields[1]);
 
-        int tokenUserId = ht.getIdUser();
-        System.out.println("kid: " + kid + " user: " + userID + " " + tokenUserId);
-        if (tokenUserId == userID) {
+        HobaUser hu1 = ht.getIdUser();
+        System.out.println("kid: " + kid + " user: " + userID + " " + hu.getIdUser());
+        if (hu.getIdUser() == userID) {
             hk = hkfrest.findHKIDbyKID(kid);
             System.out.println("hk: " + hk.getKid());
             HobaDevices hd = hk.getIdDevices();
@@ -261,7 +286,11 @@ public class HobaResource {
         for (HobaDevices hd : hds) {
             buffer.append(hd.getDidtype()).append("?");
             buffer.append(hd.getIpAddress()).append("?");
-            
+            Collection<HobaKeys> hkeys = hd.getHobaKeysCollection();
+            for (HobaKeys hkaux : hkeys) {
+                buffer.append(hkaux.getKid()).append(":");
+            }
+            buffer.append("?");
             buffer.append(hd.getLastDate());
             buffer.append("*");
         }

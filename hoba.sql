@@ -8,21 +8,19 @@
 create table hoba_token (
 	id_token serial primary key,
 	token varchar (200),
-	expiration integer references hoba_user(id_user),
-	id_user integer 
+	expiration timestamp ,
+	id_user  integer references hoba_user(id_user)
 	);
-
-
 
 create table hoba_devices (
 	id_devices serial primary key,
 	iduser integer references hoba_user(id_user),
 	did varchar(20),
-	didtype varchar(40)
+	ip_address varchar(25),
+	last_date timestamp,
+	didtype varchar(200)
 	);
-
-alter table hoba_devices alter column didtype set data type varchar (200);
-
+	
 create table hoba_keys (
 	id_keys serial primary key,
 	id_devices integer references hoba_devices(id_devices),

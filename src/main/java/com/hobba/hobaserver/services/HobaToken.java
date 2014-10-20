@@ -6,6 +6,7 @@
 package com.hobba.hobaserver.services;
 
 import java.io.Serializable;
+import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -17,6 +18,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -31,7 +34,7 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "HobaToken.findAll", query = "SELECT h FROM HobaToken h"),
     @NamedQuery(name = "HobaToken.findByIdToken", query = "SELECT h FROM HobaToken h WHERE h.idToken = :idToken"),
     @NamedQuery(name = "HobaToken.findByToken", query = "SELECT h FROM HobaToken h WHERE h.token = :token"),
-    @NamedQuery(name = "HobaToken.findByIdUser", query = "SELECT h FROM HobaToken h WHERE h.idUser = :idUser")})
+    @NamedQuery(name = "HobaToken.findByExpiration", query = "SELECT h FROM HobaToken h WHERE h.expiration = :expiration")})
 public class HobaToken implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
@@ -42,11 +45,12 @@ public class HobaToken implements Serializable {
     @Size(max = 200)
     @Column(name = "token")
     private String token;
-    @Column(name = "id_user")
-    private Integer idUser;
-    @JoinColumn(name = "expiration", referencedColumnName = "id_user")
+    @Column(name = "expiration")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date expiration;
+    @JoinColumn(name = "id_user", referencedColumnName = "id_user")
     @ManyToOne
-    private HobaUser expiration;
+    private HobaUser idUser;
 
     public HobaToken() {
     }
@@ -71,20 +75,20 @@ public class HobaToken implements Serializable {
         this.token = token;
     }
 
-    public Integer getIdUser() {
-        return idUser;
-    }
-
-    public void setIdUser(Integer idUser) {
-        this.idUser = idUser;
-    }
-
-    public HobaUser getExpiration() {
+    public Date getExpiration() {
         return expiration;
     }
 
-    public void setExpiration(HobaUser expiration) {
+    public void setExpiration(Date expiration) {
         this.expiration = expiration;
+    }
+
+    public HobaUser getIdUser() {
+        return idUser;
+    }
+
+    public void setIdUser(HobaUser idUser) {
+        this.idUser = idUser;
     }
 
     @Override

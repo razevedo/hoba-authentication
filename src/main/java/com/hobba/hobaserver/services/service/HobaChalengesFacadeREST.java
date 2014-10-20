@@ -25,7 +25,7 @@ import javax.ws.rs.Produces;
  * @author Fabio Gonçalves
  */
 @Stateless
-@Path("chalenges")
+@Path("com.hobba.hobaserver.services.hobachalenges")
 public class HobaChalengesFacadeREST extends AbstractFacade<HobaChalenges> {
     @PersistenceContext(unitName = "com.hobba_HOBAServer_war_1.0-SNAPSHOTPU")
     private EntityManager em;

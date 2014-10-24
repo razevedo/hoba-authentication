@@ -30,7 +30,7 @@ public class ApplicationConfig extends Application {
      */
     private void addRestResourceClasses(Set<Class<?>> resources) {
         resources.add(com.hobba.hobaserver.services.HobaResource.class);
-        resources.add(com.hobba.hobaserver.services.service.HobaChalengesFacadeREST.class);
+        resources.add(com.hobba.hobaserver.services.service.HobaChallengesFacadeREST.class);
         resources.add(com.hobba.hobaserver.services.service.HobaDevicesFacadeREST.class);
         resources.add(com.hobba.hobaserver.services.service.HobaKeysFacadeREST.class);
         resources.add(com.hobba.hobaserver.services.service.HobaTokenFacadeREST.class);

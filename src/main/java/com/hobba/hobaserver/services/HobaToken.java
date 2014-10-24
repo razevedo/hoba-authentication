@@ -34,7 +34,8 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "HobaToken.findAll", query = "SELECT h FROM HobaToken h"),
     @NamedQuery(name = "HobaToken.findByIdToken", query = "SELECT h FROM HobaToken h WHERE h.idToken = :idToken"),
     @NamedQuery(name = "HobaToken.findByToken", query = "SELECT h FROM HobaToken h WHERE h.token = :token"),
-    @NamedQuery(name = "HobaToken.findByExpiration", query = "SELECT h FROM HobaToken h WHERE h.expiration = :expiration")})
+    @NamedQuery(name = "HobaToken.findByExpiration", query = "SELECT h FROM HobaToken h WHERE h.expiration = :expiration"),
+    @NamedQuery(name = "HobaToken.findByIsValid", query = "SELECT h FROM HobaToken h WHERE h.isValid = :isValid")})
 public class HobaToken implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
@@ -48,6 +49,8 @@ public class HobaToken implements Serializable {
     @Column(name = "expiration")
     @Temporal(TemporalType.TIMESTAMP)
     private Date expiration;
+    @Column(name = "is_valid")
+    private Boolean isValid;
     @JoinColumn(name = "id_user", referencedColumnName = "id_user")
     @ManyToOne
     private HobaUser idUser;
@@ -81,6 +84,14 @@ public class HobaToken implements Serializable {
 
     public void setExpiration(Date expiration) {
         this.expiration = expiration;
+    }
+
+    public Boolean getIsValid() {
+        return isValid;
+    }
+
+    public void setIsValid(Boolean isValid) {
+        this.isValid = isValid;
     }
 
     public HobaUser getIdUser() {

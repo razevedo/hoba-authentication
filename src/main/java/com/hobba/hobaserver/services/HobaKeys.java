@@ -38,6 +38,8 @@ import org.codehaus.jackson.annotate.JsonIgnore;
     @NamedQuery(name = "HobaKeys.findByKid", query = "SELECT h FROM HobaKeys h WHERE h.kid = :kid"),
     @NamedQuery(name = "HobaKeys.findByPub", query = "SELECT h FROM HobaKeys h WHERE h.pub = :pub")})
 public class HobaKeys implements Serializable {
+    @OneToMany(mappedBy = "idKeys")
+    private Collection<HobaChallenges> hobaChallengesCollection;
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -54,7 +56,7 @@ public class HobaKeys implements Serializable {
     @Column(name = "pub")
     private String pub;
     @OneToMany(mappedBy = "idKeys")
-    private Collection<HobaChalenges> hobaChalengesCollection;
+    private Collection<HobaChallenges> hobaChalengesCollection;
     @JoinColumn(name = "id_devices", referencedColumnName = "id_devices")
     @ManyToOne
     private HobaDevices idDevices;
@@ -98,15 +100,7 @@ public class HobaKeys implements Serializable {
         this.pub = pub;
     }
 
-    @XmlTransient
-    @JsonIgnore
-    public Collection<HobaChalenges> getHobaChalengesCollection() {
-        return hobaChalengesCollection;
-    }
-
-    public void setHobaChalengesCollection(Collection<HobaChalenges> hobaChalengesCollection) {
-        this.hobaChalengesCollection = hobaChalengesCollection;
-    }
+   
 
     public HobaDevices getIdDevices() {
         return idDevices;
@@ -139,6 +133,16 @@ public class HobaKeys implements Serializable {
     @Override
     public String toString() {
         return "com.hobba.hobaserver.services.HobaKeys[ idKeys=" + idKeys + " ]";
+    }
+
+    @XmlTransient
+    @JsonIgnore
+    public Collection<HobaChallenges> getHobaChallengesCollection() {
+        return hobaChallengesCollection;
+    }
+
+    public void setHobaChallengesCollection(Collection<HobaChallenges> hobaChallengesCollection) {
+        this.hobaChallengesCollection = hobaChallengesCollection;
     }
     
 }

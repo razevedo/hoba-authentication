@@ -5,10 +5,12 @@
 	field3 varchar(40)
 	);
 
+
 create table hoba_token (
 	id_token serial primary key,
 	token varchar (200),
 	expiration timestamp ,
+	is_valid boolean,
 	id_user  integer references hoba_user(id_user)
 	);
 
@@ -29,9 +31,12 @@ create table hoba_keys (
 	pub varchar(500)
 	);
 
-create table hoba_chalenges (
+drop table hoba_chalenges;
+
+create table hoba_challenges (
 	id_chalenge serial primary key,
 	id_keys integer references hoba_keys(id_keys),
 	chalenge varchar(200),
-	expiration timestamp
+	expiration timestamp,
+	is_valid boolean
 	);

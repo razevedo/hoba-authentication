@@ -69,12 +69,11 @@ public class Util {
     public static String getPublicKeyFromPEM(String PEM){
         try {
             String pubKey = PEM;
+            
             pubKey = pubKey.replaceAll("(-+BEGIN PUBLIC KEY-+\\r?\\n|-+END PUBLIC KEY-+\\r?\\n?)", "");
             
-            // don't use this for real projects!
             BASE64Decoder decoder = new BASE64Decoder();
             byte[] keyBytes = decoder.decodeBuffer(pubKey);
-            
             
             return Util.getHexString(keyBytes);
         } catch (IOException ex) {

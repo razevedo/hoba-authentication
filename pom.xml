@@ -3,11 +3,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.hobba</groupId>
-    <artifactId>HOBAServer</artifactId>
+    <artifactId>HobaAuthServer</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>war</packaging>
 
-    <name>HOBAServer</name>
+    <name>HobaAuthServer</name>
 
     <properties>
         <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
@@ -163,6 +163,8 @@
                 </executions>
             </plugin>
         </plugins>
+    
+    <finalName>hobaauthserver</finalName>
     </build>
-
+    
 </project>

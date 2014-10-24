@@ -28,14 +28,15 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Fabio Gonçalves
  */
 @Entity
-@Table(name = "hoba_chalenges")
+@Table(name = "hoba_challenges")
 @XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "HobaChalenges.findAll", query = "SELECT h FROM HobaChalenges h"),
-    @NamedQuery(name = "HobaChalenges.findByIdChalenge", query = "SELECT h FROM HobaChalenges h WHERE h.idChalenge = :idChalenge"),
-    @NamedQuery(name = "HobaChalenges.findByChalenge", query = "SELECT h FROM HobaChalenges h WHERE h.chalenge = :chalenge"),
-    @NamedQuery(name = "HobaChalenges.findByExpiration", query = "SELECT h FROM HobaChalenges h WHERE h.expiration = :expiration")})
-public class HobaChalenges implements Serializable {
+    @NamedQuery(name = "HobaChallenges.findAll", query = "SELECT h FROM HobaChallenges h"),
+    @NamedQuery(name = "HobaChallenges.findByIdChalenge", query = "SELECT h FROM HobaChallenges h WHERE h.idChalenge = :idChalenge"),
+    @NamedQuery(name = "HobaChallenges.findByChalenge", query = "SELECT h FROM HobaChallenges h WHERE h.chalenge = :chalenge"),
+    @NamedQuery(name = "HobaChallenges.findByExpiration", query = "SELECT h FROM HobaChallenges h WHERE h.expiration = :expiration"),
+    @NamedQuery(name = "HobaChallenges.findByIsValid", query = "SELECT h FROM HobaChallenges h WHERE h.isValid = :isValid")})
+public class HobaChallenges implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -48,14 +49,16 @@ public class HobaChalenges implements Serializable {
     @Column(name = "expiration")
     @Temporal(TemporalType.TIMESTAMP)
     private Date expiration;
+    @Column(name = "is_valid")
+    private Boolean isValid;
     @JoinColumn(name = "id_keys", referencedColumnName = "id_keys")
     @ManyToOne
     private HobaKeys idKeys;
 
-    public HobaChalenges() {
+    public HobaChallenges() {
     }
 
-    public HobaChalenges(Integer idChalenge) {
+    public HobaChallenges(Integer idChalenge) {
         this.idChalenge = idChalenge;
     }
 
@@ -83,6 +86,14 @@ public class HobaChalenges implements Serializable {
         this.expiration = expiration;
     }
 
+    public Boolean getIsValid() {
+        return isValid;
+    }
+
+    public void setIsValid(Boolean isValid) {
+        this.isValid = isValid;
+    }
+
     public HobaKeys getIdKeys() {
         return idKeys;
     }
@@ -101,10 +112,10 @@ public class HobaChalenges implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof HobaChalenges)) {
+        if (!(object instanceof HobaChallenges)) {
             return false;
         }
-        HobaChalenges other = (HobaChalenges) object;
+        HobaChallenges other = (HobaChallenges) object;
         if ((this.idChalenge == null && other.idChalenge != null) || (this.idChalenge != null && !this.idChalenge.equals(other.idChalenge))) {
             return false;
         }
@@ -113,7 +124,7 @@ public class HobaChalenges implements Serializable {
 
     @Override
     public String toString() {
-        return "com.hobba.hobaserver.services.HobaChalenges[ idChalenge=" + idChalenge + " ]";
+        return "com.hobba.hobaserver.services.HobaChallenges[ idChalenge=" + idChalenge + " ]";
     }
     
 }

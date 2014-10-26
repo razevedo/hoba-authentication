@@ -17,6 +17,7 @@ import com.hobba.hobaserver.services.service.HobaUserFacadeREST;
 import com.hobba.hobaserver.services.util.Util;
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -102,7 +103,7 @@ public class HobaResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response athenticateUA(@Context HttpServletRequest request) {
         ChallengeUtil challengeUtil = new ChallengeUtil();
-
+        em.getEntityManagerFactory().getCache().evictAll();
         if (challengeUtil.isChallengeValid(request)) {
             return Response.status(Response.Status.OK).build();
         }
@@ -115,7 +116,7 @@ public class HobaResource {
     @Produces(MediaType.TEXT_PLAIN)
     public Response getToken(@FormParam("kid") String kid, @FormParam("expiration_time") String expiration_time) {
         TokenUtil tokenUtil = new TokenUtil();
-        
+
         String token = tokenUtil.getToken(kid, expiration_time);
         return Response.status(Response.Status.OK).entity(token).build();
     }
@@ -124,20 +125,20 @@ public class HobaResource {
     @POST
     @Produces(MediaType.TEXT_PLAIN)
     public Response authToken(@FormParam("token") String token, @FormParam("kid") String kid) {
-        
+
         em.getEntityManagerFactory().getCache().evictAll();
 
         TokenUtil tokenUtil = new TokenUtil();
         if (tokenUtil.authenticateToken(token, kid)) {
             return Response.status(Response.Status.OK).build();
         }
-        
+
         return Response.status(Response.Status.BAD_REQUEST).build();
     }
 
-    @Path("uas")
     @POST
-    @Produces(MediaType.TEXT_PLAIN)
+    @Path("uas")
+    @Produces(MediaType.APPLICATION_JSON)
     public Response getUAS(@FormParam("kid") String kid) {
         em.getEntityManagerFactory().getCache().evictAll();
 
@@ -145,8 +146,9 @@ public class HobaResource {
         HobaKeys hk = hkfrest.findHKIDbyKID(kid);
         HobaUser hu = hk.getIdDevices().getIduser();
 
-        Collection<HobaDevices> hds = hu.getHobaDevicesCollection();
-
+        List<HobaDevices> hds = new ArrayList<>(hu.getHobaDevicesCollection());
+        ResponseObject responseObject = new ResponseObject();
+        responseObject.setList(hds);
         StringBuffer buffer = new StringBuffer();
 
         for (HobaDevices hd : hds) {
@@ -178,22 +180,27 @@ public class HobaResource {
         if (hu == null) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
-        
+
         String userData = "";
-        
-        if(hu.getField1() != null) userData = userData + hu.getField1()+"*";
-        if(hu.getField2() != null) userData = userData + hu.getField2()+"*";
-        if(hu.getField3() != null) userData = userData + hu.getField3();
-        
-        
+
+        if (hu.getField1() != null) {
+            userData = userData + hu.getField1() + "*";
+        }
+        if (hu.getField2() != null) {
+            userData = userData + hu.getField2() + "*";
+        }
+        if (hu.getField3() != null) {
+            userData = userData + hu.getField3();
+        }
+
         return Response.status(Response.Status.OK).entity(userData).build();
     }
-    
+
     @Path("user_set")
     @POST
     @Produces(MediaType.TEXT_PLAIN)
     public Response serUserData(
-            @FormParam("kid") String kid, 
+            @FormParam("kid") String kid,
             @FormParam("field1") String field1,
             @FormParam("field2") String field2,
             @FormParam("field3") String field3) {
@@ -207,14 +214,14 @@ public class HobaResource {
         if (hu == null) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
-        
+
         hu.setField1(field1);
         hu.setField2(field2);
         hu.setField3(field3);
-        
+
         HobaUserFacadeREST hufrest = new HobaUserFacadeREST();
         hufrest.create(hu);
-        
+
         return Response.status(Response.Status.OK).build();
     }
 

@@ -30,7 +30,6 @@ public class ChallengeUtil {
         HobaKeys hk = new HobaKeys();
         HobaKeysFacadeREST hkfrest = new HobaKeysFacadeREST();
         HobaChallengesFacadeREST hcfrest = new HobaChallengesFacadeREST();
-
         hk = hkfrest.findHKIDbyKID(kid);
 
         SecureRandom random = new SecureRandom();
@@ -107,6 +106,7 @@ public class ChallengeUtil {
         String origin = request.getRequestURL().toString();
         origin = origin.split("/")[0] + "//" + origin.split("/")[2] + "/";
         String hobaTbs = nonce + " " + alg + " " + origin + " " + kid + " " + chalenge;
+        System.out.println("hoba: "+hobaTbs);
         return hobaTbs;
     }
 
@@ -114,7 +114,7 @@ public class ChallengeUtil {
         String header = request.getHeader("Authorized");
         String[] headerParams = header.split("[.]");
         String signBase64 = headerParams[3];
-        System.out.println(signBase64);
+        
         byte[] decodedToken = Base64.decodeBase64(signBase64.getBytes());
         String decodedSign = new String(decodedToken);
         return decodedSign;
@@ -124,6 +124,7 @@ public class ChallengeUtil {
         String header = request.getHeader("Authorized");
         String[] headerParams = header.split("[.]");
         String kid = headerParams[0];
+        
         return kid;
     }
 

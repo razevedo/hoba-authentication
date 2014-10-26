@@ -23,15 +23,20 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.Size;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 /**
  *
  * @author Fabio Gonçalves
  */
 @Entity
+@XmlAccessorType(XmlAccessType.PUBLIC_MEMBER)
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @Table(name = "hoba_devices")
 @XmlRootElement
 @NamedQueries({

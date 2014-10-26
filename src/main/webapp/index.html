@@ -1,10 +1,250 @@
 <!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
 <html>
     <head>
-        <title>Start Page</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+        <title>JSP Page</title>
+
+
+        <!--
+                <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.9.0/jquery-ui.min.js"></script>
+        -->
+        <link rel="stylesheet" href="assets/metro/css/metro-bootstrap-responsive.min.css">
+        <link rel="stylesheet" href="assets/metro/css/metro-bootstrap.min.css">
+        <link rel="stylesheet" href="assets/metro/fonts/iconFont.min.css">
+
+
+
     </head>
-    <body>
-        <h1>Hello World!</h1>
+    <body class="metro">
+        <div class="container">
+            <div id="pageHeader" class="grid" style="">
+                <div class="row">
+                    <div class="span3"></div>
+                    <div class="span11 grid">
+                        <div class="row">
+                            <div>
+                                <h1 class="header">HOBA 1</h1>
+                                <h1 class="subheader">Registo sem palavras passe</h1>
+
+                            </div>
+                            <div id="buttons" class="place-right">
+                                <button class="button  span2 success" id="login" onclick="userLogin()">Login</button>
+                                <button class="button  span2 inverse" id="logout" onclick="logout()">Logout</button>
+                                <button class="button  span2 primary" id="register" onclick="userRegister()">Register</button>
+                                <button class="button  span2 warning" id="unregister" onclick="unregister()">Un-Register</button>
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+            <div class="grid">
+                <div class="row">
+                    <div class="grid">
+                        <div class="row span2">
+                            <div class="row">
+                                <div class="tile tile-content text bg-yellow text-center" id="connections" onclick="getUAS();">
+                                    <br>
+                                    <br>
+                                    <h4>Connections</h4>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="tile tile-content text bg-green text-center" id="token" onclick="showTokenOpt();">
+                                    <br>
+                                    <br>
+                                    <h4>Token</h4>
+                                </div>
+
+                            </div>
+                            <div class="row">
+                                <div class="tile tile-content text bg-indigo text-center" id="qrcode" onclick="getQRCode();">
+                                    <br>
+                                    <br>
+                                    <h4>QRCode</h4>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="tile tile-content text bg-blue text-center" id="userbutton" onclick="getUserData();">
+                                    <br>
+                                    <br>
+                                    <h4>User Data</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="span12 row">
+                            <div class="grid">
+                                <div class="row"  >
+                                    <div class="span4"></div>
+                                    <div class="span5">
+                                        <fieldset hidden id="tokenExpire">
+                                            <form>
+                                                <label>Tempo de validade</label>
+
+                                                <select id="expirationTime">
+
+                                                </select>
+
+
+                                            </form>
+                                            <button class="button primary" onclick="getTokenLink()">Pedir Token</button>
+                                        </fieldset>
+                                    </div>
+                                </div>
+                                <div class="row" id="reponsediv">
+
+                                </div>
+                                <div class="row">
+                                    <div class="span3">
+                                    </div>
+                                    <div class="span7" id="qrcodediv">
+
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="span3">
+
+                                    </div>
+                                    <div class="span7" id="userdata" hidden>
+                                        <br>
+                                        <br>
+                                        <form>
+                                            <fieldset>
+                                                <table class="table">
+                                                    <tr>
+                                                        <td><strong>Campo 1</strong></td>
+                                                        <td></td>
+                                                        <td><input id="field1" ></td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td><strong>Campo 2</strong></td>
+                                                        <td></td>
+                                                        <td><input id="field2" ></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><strong>Campo 3 </strong></td>
+                                                        <td></td>
+                                                        <td><input id="field3" ></td>
+                                                    </tr>
+                                                </table>
+                                            </fieldset>
+                                            <input class="" type="button" value="Submit" onclick="addUserData();" />
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div id="log"></div>
+
+
+        </div>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.9.0/jquery-ui.min.js"></script>
+        <script src="assets/metro/js/metro.min.js" type="text/javascript"></script>
+        <script language="JavaScript" type="text/javascript" src="js/jsrsasign-4.7.0-all-min.js"></script>
+        <script type="text/javascript" src="js/getPublicKeyID.js"></script>
+        <script type="text/javascript" src="js/fingerprint.js"></script>
+
+
+        <script type="text/javascript" src="js/qrcode.min.js"></script>
+        <script type="text/javascript" src="js/hoba_auth.js"></script>
+
+        <script type="text/javascript">
+                                                $(document).ready(function () {
+
+                                                    hobaInit("http://localhost:8080/hoba-autthentication/hoba/");
+                                                    var isRegisted = hobaIsRegisted();
+                                                    var isLogin = hobaIsLoggin();
+
+                                                    manageButtons(isLogin, isRegisted);
+
+                                                });
+
+
+                                                function userRegister() {
+                                                    var response;
+                                                    response = hobaRegistration();
+                                                    if (response === 0) {
+                                                        manageButtons(false, true);
+                                                    }
+                                                }
+
+                                                function userLogin() {
+                                                    var response;
+                                                    response = hobaLogin();
+                                                    console.log(response);
+                                                    if (response === 0) {
+                                                        manageButtons(true, true);
+                                                    }
+                                                }
+
+                                                function logout() {
+                                                    hobaLogout();
+                                                    manageButtons(false, true);
+                                                }
+                                                function unregister() {
+                                                    hobaUnregister();
+                                                    manageButtons(false, false);
+                                                }
+
+                                                function getUserData() {
+                                                    hobaGetUserData();
+                                                }
+
+                                                function manageButtons(login, registed) {
+                                                    console.log(login);
+                                                    console.log(registed);
+                                                    if (login) {
+                                                        $("#login").hide();
+                                                        $("#logout").show();
+                                                        $("#connections").show();
+                                                        $("#token").show();
+                                                        $("#qrcode").show();
+                                                        $("#userdata").show();
+                                                        $("#userbutton").show();
+                                                    }
+                                                    else {
+                                                        $("#logout").hide();
+                                                        $("#connections").hide();
+                                                        $("#qrcode").hide();
+                                                        $("#tokenExpire").hide();
+                                                        $("#token").hide();
+                                                        $("#userdata").hide();
+                                                        $("#userbutton").hide();
+                                                    }
+                                                    if (registed) {
+                                                        $("#unregister").show();
+                                                        if (!login) {
+                                                            $("#login").show();
+                                                        }
+                                                        $("#register").hide();
+                                                    } else {
+                                                        $("#unregister").hide();
+                                                        $("#login").hide();
+                                                        $("#register").show();
+                                                    }
+                                                }
+
+
+
+        </script>
+
     </body>
+
+
 </html>

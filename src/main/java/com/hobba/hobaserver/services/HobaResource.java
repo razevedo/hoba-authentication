@@ -32,6 +32,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.apache.commons.codec.binary.Base64;
@@ -166,10 +167,11 @@ public class HobaResource {
         return Response.status(Response.Status.OK).entity(buffer.toString()).build();
     }
 
-    @Path("user_data")
-    @POST
-    @Produces(MediaType.TEXT_PLAIN)
-    public Response getUserData(@FormParam("kid") String kid) {
+    @Path("user")
+    @GET
+    @Produces({"application/xml", "application/json"})
+    public Response getUserData(@QueryParam("kid") String kid) {
+        System.out.println("kid: "+kid);
         em.getEntityManagerFactory().getCache().evictAll();
 
         HobaKeysFacadeREST hkfrest = new HobaKeysFacadeREST();
@@ -181,19 +183,8 @@ public class HobaResource {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
 
-        String userData = "";
 
-        if (hu.getField1() != null) {
-            userData = userData + hu.getField1() + "*";
-        }
-        if (hu.getField2() != null) {
-            userData = userData + hu.getField2() + "*";
-        }
-        if (hu.getField3() != null) {
-            userData = userData + hu.getField3();
-        }
-
-        return Response.status(Response.Status.OK).entity(userData).build();
+        return Response.status(Response.Status.OK).entity(hu).build();
     }
 
     @Path("user_set")

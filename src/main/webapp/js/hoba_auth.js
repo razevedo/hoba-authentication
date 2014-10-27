@@ -69,7 +69,7 @@ function hobaRegistration() {
 
 function hobaLogin() {
     var challResponse = hobaGetChallenge();
-    console.log(challResponse);
+    
     if (challResponse != 0) {
         return challResponse;
     }
@@ -78,17 +78,138 @@ function hobaLogin() {
 }
 
 function hobaGetUserData() {
-    console.log("getUser");
-    $.get(hoba_authentication.hoba_server + "user?kid="+hoba_authentication.hoba_kid, function (data, status, xhr) {
-        console.log(status);
-        console.log(data);
-        var jdata = JSON.parse(data);
-        console.log(jdata);
+    var response;
+    $.ajax({
+        type: "GET",
+        url: hoba_authentication.hoba_server + "user?kid=" + hoba_authentication.hoba_kid,
+        async: false
+    }).always(function (data, status, xhr) {
+        
         if (status == "success") {
-            
+            response = data;
+        } else {
+            response = -1;
         }
     });
+
+    return response;
 }
+
+function hobaSetUserData(field1, field2, field3) {
+    var response;
+    
+    $.ajax({
+        type: "POST",
+        url: hoba_authentication.hoba_server + "user",
+        data: {
+            kid: hoba_authentication.hoba_kid,
+            field1: field1,
+            field2: field2,
+            field3: field3
+        },
+        async: false
+    }).always(function (data, status, xhr) {
+        if (status == "success") {
+            response = 0;
+        } else {
+            response = -1;
+        }
+    });
+    return response;
+}
+
+function hobaGetConnections() {
+    var response;
+    $.ajax({
+        type: "GET",
+        url: hoba_authentication.hoba_server + "uas",
+        data: {
+            kid: hoba_authentication.hoba_kid
+        },
+        async: false
+    }).always(
+            function (data, status, xhr) {
+
+                if (status == "success") {
+                    response = data;
+                }else{
+                    response = -1;
+                }
+            }
+    );
+    
+    return response;
+}
+
+function hobaGetToken(expirationTime) {
+    var response;
+    var origin = window.location.href;
+    origin = origin.substring(0,origin.length-1);
+    
+    $.ajax({
+        type: "GET",
+        url: hoba_authentication.hoba_server + "token?kid="+hoba_authentication.hoba_kid+"&expiration_time="+expirationTime,
+        
+        async: false
+    }).always(
+            function (data, status, xhr) {
+                if (status == "success") {
+                    response = origin+"?"+data;
+                }else{
+                    response = -1;
+                }
+            }
+    );
+    
+    return response;
+}
+
+function hobaBind(token) {
+    
+    var response;
+    $.ajax({
+        type: "POST",
+        url: hoba_authentication.hoba_server + "token_auth",
+        data:{
+            kid: hoba_authentication.hoba_kid,
+            token: token
+        },
+        async: false
+    }).always(
+            function (data, status, xhr) {
+                if (status == "success") {
+                    response = 0;
+                }else{
+                    response = -1;
+                }
+            }
+    );
+    return response;
+}
+
+function hobaRemoveKid(kid) {
+    
+    var response;
+    $.ajax({
+        type: "DELETE",
+        url: hoba_authentication.hoba_server + "del",
+        data:{
+            kid: kid
+        },
+        async: false
+    }).always(
+            function (data, status, xhr) {
+                if (status == "success") {
+                    response = 0;
+                }else{
+                    response = -1;
+                }
+            }
+    );
+    return response;
+}
+
+
 
 function hobaGetChallenge() {
     var response;
@@ -143,7 +264,7 @@ function hobaAuth(signedClientResult) {
                     sessionStorage.setItem("loggedin", true);
                     response = 0;
                 } else {
-                    sessionStorage.setItem("loggedin", false);
+                    sessionStorage.removeItem("loggedin");
                     response = -1;
                 }
             });
@@ -197,7 +318,7 @@ function hobaIsLoggin() {
     if (loggedin == null) {
         return false;
     }
-
+    
     return Boolean(loggedin);
 }
 
@@ -234,11 +355,27 @@ function makeRandString()
 }
 
 function getHOBATBS(challenge, nonce) {
-
+var origin = window.location.href;
+    origin = origin.substring(0,origin.length-1);
+    
+    origin = origin.substring(0,origin.lastIndexOf("/")+1);
+    
     var alg = "1";
-    var origin = "http://localhost:8080/";
+    
     var kid_tbs = hoba_authentication.hoba_kid;
     var challenge_tbs = challenge;
     var tbs = nonce + " " + alg + " " + origin + " " + kid_tbs + " " + challenge;
     return tbs;
+}
+
+function hobaGetLinkToken() {
+    var r = true;
+
+    var token = window.location.search.substring(1);
+    token = token.replace("token=", "");
+
+    if (token != null && token != "") {
+        return token;
+    }
+    return -1;
 }

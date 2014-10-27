@@ -6,7 +6,7 @@
 package com.hobba.hobaserver.services.service;
 
 import com.hobba.hobaserver.entitymanager.EntityManagerListener;
-import com.hobba.hobaserver.services.HobaChallenges;
+import com.hobba.hobaserver.resources.HobaChallenges;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -19,6 +19,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 
 /**
  *

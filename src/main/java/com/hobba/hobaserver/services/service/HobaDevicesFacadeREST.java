@@ -6,7 +6,7 @@
 package com.hobba.hobaserver.services.service;
 
 import com.hobba.hobaserver.entitymanager.EntityManagerListener;
-import com.hobba.hobaserver.services.HobaDevices;
+import com.hobba.hobaserver.resources.HobaDevices;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;

@@ -5,7 +5,7 @@
  */
 package com.hobba.hobaserver.services.util;
 
-import com.hobba.hobaserver.services.HobaResource;
+import com.hobba.hobaserver.services.service.HobaResource;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;

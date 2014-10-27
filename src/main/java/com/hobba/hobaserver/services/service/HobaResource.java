@@ -3,29 +3,28 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.hobba.hobaserver.services;
+package com.hobba.hobaserver.services.service;
 
 import com.hobba.hobaserver.entitymanager.EntityManagerListener;
+import com.hobba.hobaserver.resources.HobaConnections;
+import com.hobba.hobaserver.resources.HobaDevices;
+import com.hobba.hobaserver.resources.HobaKeys;
+import com.hobba.hobaserver.resources.HobaUser;
+import com.hobba.hobaserver.resources.ResponseObject;
 import com.hobba.hobaserver.services.security.ChallengeUtil;
 import com.hobba.hobaserver.services.security.RegisterUtil;
 import com.hobba.hobaserver.services.security.TokenUtil;
-import com.hobba.hobaserver.services.service.HobaChallengesFacadeREST;
-import com.hobba.hobaserver.services.service.HobaDevicesFacadeREST;
 import com.hobba.hobaserver.services.service.HobaKeysFacadeREST;
-import com.hobba.hobaserver.services.service.HobaTokenFacadeREST;
 import com.hobba.hobaserver.services.service.HobaUserFacadeREST;
-import com.hobba.hobaserver.services.util.Util;
-import java.math.BigInteger;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -35,7 +34,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import org.apache.commons.codec.binary.Base64;
 
 /**
  * REST Web Service
@@ -98,6 +96,21 @@ public class HobaResource {
         return Response.status(Response.Status.OK).header("Authentication", "HOBA").header("challenge", challenge).header("max-age", 10).build();
 
     }
+    
+    @Path("del")
+    @DELETE
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response deleteKey(@FormParam("kid") String kid) {
+        
+        HobaKeysFacadeREST hkfrest = new HobaKeysFacadeREST();
+        HobaDevices hd = hkfrest.findHKIDbyKID(kid).getIdDevices();
+        
+        HobaDevicesFacadeREST hdfrest = new HobaDevicesFacadeREST();
+        hdfrest.remove(hd);
+        
+        return Response.status(Response.Status.OK).build();
+
+    }
 
     @Path("auth")
     @POST
@@ -113,9 +126,9 @@ public class HobaResource {
     }
 
     @Path("token")
-    @POST
+    @GET
     @Produces(MediaType.TEXT_PLAIN)
-    public Response getToken(@FormParam("kid") String kid, @FormParam("expiration_time") String expiration_time) {
+    public Response getToken(@QueryParam("kid") String kid, @QueryParam("expiration_time") String expiration_time) {
         TokenUtil tokenUtil = new TokenUtil();
 
         String token = tokenUtil.getToken(kid, expiration_time);
@@ -137,41 +150,33 @@ public class HobaResource {
         return Response.status(Response.Status.BAD_REQUEST).build();
     }
 
-    @POST
+    @GET
     @Path("uas")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getUAS(@FormParam("kid") String kid) {
+    public Response getUAS(@QueryParam("kid") String kid) {
         em.getEntityManagerFactory().getCache().evictAll();
 
         HobaKeysFacadeREST hkfrest = new HobaKeysFacadeREST();
         HobaKeys hk = hkfrest.findHKIDbyKID(kid);
         HobaUser hu = hk.getIdDevices().getIduser();
 
-        List<HobaDevices> hds = new ArrayList<>(hu.getHobaDevicesCollection());
-        ResponseObject responseObject = new ResponseObject();
-        responseObject.setList(hds);
-        StringBuffer buffer = new StringBuffer();
-
-        for (HobaDevices hd : hds) {
-            buffer.append(hd.getDidtype()).append("?");
-            buffer.append(hd.getIpAddress()).append("?");
-            Collection<HobaKeys> hkeys = hd.getHobaKeysCollection();
-            for (HobaKeys hkaux : hkeys) {
-                buffer.append(hkaux.getKid()).append(":");
-            }
-            buffer.append("?");
-            buffer.append(hd.getLastDate());
-            buffer.append("*");
+        Collection<HobaDevices> hds = hu.getHobaDevicesCollection();
+        List<HobaConnections> hcs = new ArrayList<HobaConnections>();
+        HobaConnections hc;
+        for(HobaDevices hd: hds){
+            List<HobaKeys> aux = new ArrayList<HobaKeys>(hd.getHobaKeysCollection());
+            System.out.println("aux.get(aux.size()-1).getKid(): "+aux.get(aux.size()-1).getKid());
+            hc = new HobaConnections(hd.getDidtype(), hd.getIpAddress(), hd.getLastDate(), aux.get(aux.size()-1).getKid());
+            hcs.add(hc);
         }
 
-        return Response.status(Response.Status.OK).entity(buffer.toString()).build();
+        return Response.status(Response.Status.OK).entity(hcs).build();
     }
 
     @Path("user")
     @GET
-    @Produces({"application/xml", "application/json"})
+    @Produces(MediaType.APPLICATION_JSON)
     public Response getUserData(@QueryParam("kid") String kid) {
-        System.out.println("kid: "+kid);
         em.getEntityManagerFactory().getCache().evictAll();
 
         HobaKeysFacadeREST hkfrest = new HobaKeysFacadeREST();
@@ -183,13 +188,12 @@ public class HobaResource {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
 
-
         return Response.status(Response.Status.OK).entity(hu).build();
     }
 
-    @Path("user_set")
+    @Path("user")
     @POST
-    @Produces(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.APPLICATION_JSON)
     public Response serUserData(
             @FormParam("kid") String kid,
             @FormParam("field1") String field1,

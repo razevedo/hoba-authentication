@@ -5,10 +5,10 @@
  */
 package com.hobba.hobaserver.services.security;
 
-import com.hobba.hobaserver.services.HobaDevices;
-import com.hobba.hobaserver.services.HobaKeys;
-import com.hobba.hobaserver.services.HobaToken;
-import com.hobba.hobaserver.services.HobaUser;
+import com.hobba.hobaserver.resources.HobaDevices;
+import com.hobba.hobaserver.resources.HobaKeys;
+import com.hobba.hobaserver.resources.HobaToken;
+import com.hobba.hobaserver.resources.HobaUser;
 import com.hobba.hobaserver.services.service.HobaDevicesFacadeREST;
 import com.hobba.hobaserver.services.service.HobaKeysFacadeREST;
 import com.hobba.hobaserver.services.service.HobaTokenFacadeREST;

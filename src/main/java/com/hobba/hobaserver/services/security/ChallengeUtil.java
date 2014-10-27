@@ -5,9 +5,9 @@
  */
 package com.hobba.hobaserver.services.security;
 
-import com.hobba.hobaserver.services.HobaChallenges;
-import com.hobba.hobaserver.services.HobaDevices;
-import com.hobba.hobaserver.services.HobaKeys;
+import com.hobba.hobaserver.resources.HobaChallenges;
+import com.hobba.hobaserver.resources.HobaDevices;
+import com.hobba.hobaserver.resources.HobaKeys;
 import com.hobba.hobaserver.services.service.HobaChallengesFacadeREST;
 import com.hobba.hobaserver.services.service.HobaDevicesFacadeREST;
 import com.hobba.hobaserver.services.service.HobaKeysFacadeREST;

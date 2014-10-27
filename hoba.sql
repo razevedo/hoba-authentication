@@ -11,12 +11,12 @@ create table hoba_token (
 	token varchar (200),
 	expiration timestamp ,
 	is_valid boolean,
-	id_user  integer references hoba_user(id_user)
+	id_user  integer references hoba_user(id_user) ON UPDATE NO ACTION ON DELETE CASCADE
 	);
 
 create table hoba_devices (
 	id_devices serial primary key,
-	iduser integer references hoba_user(id_user),
+	iduser integer references hoba_user(id_user) ON UPDATE NO ACTION ON DELETE CASCADE,
 	did varchar(20),
 	ip_address varchar(25),
 	last_date timestamp,
@@ -25,7 +25,7 @@ create table hoba_devices (
 	
 create table hoba_keys (
 	id_keys serial primary key,
-	id_devices integer references hoba_devices(id_devices),
+	id_devices integer references hoba_devices(id_devices) ON UPDATE NO ACTION ON DELETE CASCADE,
 	kidtype varchar(20),
 	kid varchar(40),
 	pub varchar(500)
@@ -35,7 +35,7 @@ drop table hoba_chalenges;
 
 create table hoba_challenges (
 	id_chalenge serial primary key,
-	id_keys integer references hoba_keys(id_keys),
+	id_keys integer references hoba_keys(id_keys) ON UPDATE NO ACTION ON DELETE CASCADE,
 	chalenge varchar(200),
 	expiration timestamp,
 	is_valid boolean

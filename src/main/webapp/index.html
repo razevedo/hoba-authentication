@@ -29,22 +29,29 @@ and open the template in the editor.
                     <div class="span3"></div>
                     <div class="span11 grid">
                         <div class="row">
-                            <div>
+                            <div class="span7">
                                 <h1 class="header">HOBA 1</h1>
                                 <h1 class="subheader">Registo sem palavras passe</h1>
-
                             </div>
-                            <div id="buttons" class="place-right">
-                                <button class="button  span2 success" id="login" onclick="userLogin()">Login</button>
-                                <button class="button  span2 inverse" id="logout" onclick="logout()">Logout</button>
-                                <button class="button  span2 primary" id="register" onclick="userRegister()">Register</button>
-                                <button class="button  span2 warning" id="unregister" onclick="unregister()">Un-Register</button>
+                            <div class="span4">
+                                <h4 id="welcomeMessage">
+
+                                </h4>
                             </div>
 
+
+                        </div>
+                        <div id="buttons" class="place-right  ">
+                            <button class="button  span2 success" id="login" onclick="userLogin()">Login</button>
+                            <button class="button  span2 inverse" id="logout" onclick="logout()">Logout</button>
+                            <button class="button  span2 primary" id="register" onclick="userRegister()">Register</button>
+                            <button class="button  span2 warning" id="unregister" onclick="unregister()">Un-Register</button>
                         </div>
                     </div>
 
+                    <div class="span5" id="operResult">
 
+                    </div>
                 </div>
             </div>
             <div class="grid">
@@ -122,18 +129,18 @@ and open the template in the editor.
                                             <fieldset>
                                                 <table class="table">
                                                     <tr>
-                                                        <td><strong>Campo 1</strong></td>
+                                                        <td><strong>Name</strong></td>
                                                         <td></td>
                                                         <td><input id="field1" ></td>
                                                     </tr>
 
                                                     <tr>
-                                                        <td><strong>Campo 2</strong></td>
+                                                        <td><strong>Address</strong></td>
                                                         <td></td>
                                                         <td><input id="field2" ></td>
                                                     </tr>
                                                     <tr>
-                                                        <td><strong>Campo 3 </strong></td>
+                                                        <td><strong>E-mail</strong></td>
                                                         <td></td>
                                                         <td><input id="field3" ></td>
                                                     </tr>
@@ -167,13 +174,94 @@ and open the template in the editor.
         <script type="text/javascript">
                                                 $(document).ready(function () {
 
-                                                    hobaInit("http://localhost:8080/hoba-autthentication/hoba/");
-                                                    var isRegisted = hobaIsRegisted();
-                                                    var isLogin = hobaIsLoggin();
+                                                    hobaInit("http://localhost:8080/hoba-authentication/hoba/");
 
+                                                    var token = hobaGetLinkToken();
+
+
+                                                    var isRegisted = hobaIsRegisted();
+
+                                                    if (token != -1) {
+                                                        var resp = false;
+                                                        if (isRegisted) {
+                                                            resp = confirm("You already have another account registed in in this browser. Do you want to associate it with another user?");
+                                                        } else {
+                                                            hobaRegistration();
+                                                            isRegisted = hobaIsRegisted();
+                                                            resp = true;
+                                                        }
+                                                        if (resp) {
+                                                            var response = hobaBind(token);
+                                                            if (response === 0) {
+                                                                setOperationResultMessage("This account has been successfuly binded", false);
+                                                                setTimeout(function () {
+                                                                    window.location.replace("http://localhost:8080/hoba-authentication");
+                                                                }, 3000);
+                                                            } else {
+                                                                setOperationResultMessage("Error binding, please try again or ask for another token", true);
+                                                            }
+                                                        }
+                                                    }
+
+                                                    var isLogin = hobaIsLoggin();
+                                                    if (isLogin) {
+                                                        getUAS();
+                                                        showWelcomeMesage();
+                                                    }
                                                     manageButtons(isLogin, isRegisted);
+                                                    $("#userdata").hide();
 
                                                 });
+
+                                                function showWelcomeMesage() {
+                                                    var data = hobaGetUserData();
+                                                    if (data.field1 != null) {
+                                                        $("#welcomeMessage").text("Welcome: " + data.field1);
+                                                        $("#welcomeMessage").show();
+                                                    }
+                                                }
+
+                                                function getQRCode() {
+
+                                                    cleanDivs();
+                                                    $("#qrcodediv").show();
+                                                    var qrcode = new QRCode("qrcodediv");
+                                                    qrcode.clear();
+                                                    var response = hobaGetToken(expirationTime);
+                                                    if (response != -1) {
+                                                        var code = response;
+                                                        qrcode.makeCode(code);
+                                                    }
+
+                                                }
+
+                                                function showTokenOpt() {
+
+                                                    cleanDivs();
+                                                    $("#tokenExpire").show();
+                                                    var expirationTime = $("#expirationTime");
+                                                    var options;
+                                                    for (i = 0; i <= 10; i++) {
+                                                        options = options + "<option value='" + i * 10 + "'>" + i * 10 + "</option>";
+                                                    }
+
+                                                    for (i = 2; i <= 10; i++) {
+                                                        options = options + "<option value='" + i * 100 + "'>" + i * 100 + "</option>";
+                                                    }
+                                                    expirationTime.html(options);
+                                                }
+
+                                                function getTokenLink() {
+                                                    cleanDivs();
+                                                    $("#reponsediv").show();
+                                                    var expirationTime = $("#expirationTime").val();
+                                                    var response = hobaGetToken(expirationTime);
+                                                    console.log(response);
+                                                    if (response != -1) {
+                                                        $("#reponsediv").html(response);
+                                                    }
+                                                }
+
 
 
                                                 function userRegister() {
@@ -187,15 +275,19 @@ and open the template in the editor.
                                                 function userLogin() {
                                                     var response;
                                                     response = hobaLogin();
-                                                    console.log(response);
                                                     if (response === 0) {
                                                         manageButtons(true, true);
+                                                        setOperationResultMessage("Successful Login", false);
+                                                        showWelcomeMesage();
+                                                    } else {
+                                                        setOperationResultMessage("Error logging in", true);
                                                     }
                                                 }
 
                                                 function logout() {
                                                     hobaLogout();
                                                     manageButtons(false, true);
+                                                    $("#welcomeMessage").hide();
                                                 }
                                                 function unregister() {
                                                     hobaUnregister();
@@ -203,20 +295,99 @@ and open the template in the editor.
                                                 }
 
                                                 function getUserData() {
-                                                    hobaGetUserData();
+                                                    cleanDivs();
+                                                    $("#userdata").show();
+
+                                                    var data = hobaGetUserData();
+                                                    if (data.field1 != null) {
+                                                        $("#field1").val(data.field1);
+                                                    }
+                                                    if (data.field2 != null) {
+                                                        $("#field2").val(data.field2);
+                                                    }
+                                                    if (data.field3 != null) {
+                                                        $("#field3").val(data.field3);
+                                                    }
+                                                }
+
+                                                function getUAS() {
+                                                    cleanDivs();
+                                                    var data = hobaGetConnections();
+
+                                                    if (data != -1) {
+                                                        var responseDiv = $("#reponsediv");
+                                                        var table = "<table class='table striped' id='connectionsTable'>"
+                                                        table = table + "<thead><td>Device Type</td><td>Ip Address</td><td>Date</td><td>Key ID</td><td>Delete</td></thead>";
+                                                        for (var obj in data) {
+                                                            table = table + "<tr>";
+                                                            table = table + "<td>";
+                                                            table = table + data[obj].deviceType;
+                                                            table = table + "</td>";
+                                                            table = table + "<td>";
+                                                            table = table + data[obj].ipAddress;
+                                                            table = table + "</td>";
+                                                            table = table + "<td>";
+                                                            table = table + new Date(data[obj].date);
+                                                            table = table + "</td>";
+                                                            table = table + "<td>";
+                                                            table = table + data[obj].kid;
+                                                            table = table + "</td>";
+                                                            table = table + "<td>";
+                                                            table = table + "<btn onclick='removeRow(this)'><span class='icon-cancel fg-red place' ></span></a>";
+                                                            table = table + "</td>";
+                                                            table = table + "</tr>";
+                                                        }
+                                                        table = table + "</table>";
+                                                        responseDiv.html(table);
+                                                        responseDiv.show();
+                                                    }
+                                                }
+
+
+
+                                                function removeRow(button) {
+                                                    //alert("aqui" + $(this).closest("tr"));
+                                                    var tr = button.parentNode.parentNode;
+                                                    var kidRemove = tr.childNodes[3].innerHTML;
+
+                                                    var del = confirm("Do you want to delete the device with kid: " + kidRemove);
+                                                    if (del) {
+                                                        var response = hobaRemoveKid(kidRemove.toString());
+                                                        console.log(response);
+                                                        if (response == 0) {
+                                                            setOperationResultMessage("KID removed", false);
+                                                            getUAS();
+                                                        } else {
+                                                            setOperationResultMessage("Erro Removing KID", true);
+                                                        }
+                                                    }
+
+                                                }
+
+                                                function addUserData() {
+                                                    var field1 = $("#field1").val();
+                                                    var field2 = $("#field2").val();
+                                                    var field3 = $("#field3").val();
+
+                                                    var resp = hobaSetUserData(field1, field2, field3);
+                                                    if (resp === 0) {
+                                                        setOperationResultMessage("User data added successfuly", false);
+                                                    } else {
+                                                        setOperationResultMessage("Error adding user data", true);
+                                                    }
                                                 }
 
                                                 function manageButtons(login, registed) {
-                                                    console.log(login);
-                                                    console.log(registed);
+
                                                     if (login) {
                                                         $("#login").hide();
                                                         $("#logout").show();
                                                         $("#connections").show();
                                                         $("#token").show();
                                                         $("#qrcode").show();
-                                                        $("#userdata").show();
+                                                        $("#userdata").hide();
                                                         $("#userbutton").show();
+                                                        $("#reponsediv").show();
                                                     }
                                                     else {
                                                         $("#logout").hide();
@@ -226,6 +397,7 @@ and open the template in the editor.
                                                         $("#token").hide();
                                                         $("#userdata").hide();
                                                         $("#userbutton").hide();
+                                                        $("#reponsediv").hide();
                                                     }
                                                     if (registed) {
                                                         $("#unregister").show();
@@ -238,6 +410,37 @@ and open the template in the editor.
                                                         $("#login").hide();
                                                         $("#register").show();
                                                     }
+                                                }
+
+                                                function setOperationResultMessage(message, error) {
+                                                    var operResult = $("#operResult");
+                                                    operResult.show();
+                                                    var color = "green";
+                                                    if (error) {
+                                                        color = "red";
+                                                    }
+                                                    var operMessage = "<h5 style='color: " + color + "'>"
+                                                    operMessage = operMessage + message;
+                                                    operMessage = operMessage + "<h5/>";
+                                                    operResult.html(operMessage);
+                                                    setInterval(function () {
+                                                        operResult.hide()
+                                                    }
+                                                    , 3000);
+                                                }
+
+                                                function cleanDivs() {
+                                                    $("#userdata").hide();
+                                                    $("#field1").val("");
+                                                    $("#field2").val("");
+                                                    $("#field3").val("");
+                                                    $("#reponsediv").hide();
+                                                    $("#reponsediv").html("");
+                                                    $("#tokenExpire").hide();
+
+                                                    $("#qrcodediv").hide();
+                                                    $("#qrcodediv").html("");
+                                                    $("#reponsediv").html("");
                                                 }
 
 

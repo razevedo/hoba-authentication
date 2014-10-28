@@ -15,6 +15,7 @@ import com.hobba.hobaserver.services.util.Util;
 import java.util.Date;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
+import org.bouncycastle.util.encoders.Base64;
 
 /**
  *
@@ -22,6 +23,8 @@ import javax.ws.rs.core.Response;
  */
 public class RegisterUtil {
     public boolean userRegister(String did, String didType, String kid, String kidType, String pub, HttpServletRequest request){
+        
+        String decodedKid = new String(Base64.decode(kid.getBytes()));
         
         HobaUser hu = createUser();
         if(hu == null){
@@ -33,7 +36,7 @@ public class RegisterUtil {
             return false;
         }
         
-        HobaKeys hk = createKeys(hd, kid, kidType, pub);
+        HobaKeys hk = createKeys(hd, decodedKid, kidType, pub);
         if(hk == null){
             return false;
         }

@@ -111,6 +111,21 @@ public class HobaResource {
         return Response.status(Response.Status.OK).build();
 
     }
+    
+    @Path("del_all")
+    @DELETE
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response deleteAll(@FormParam("kid") String kid) {
+        
+        HobaKeysFacadeREST hkfrest = new HobaKeysFacadeREST();
+        HobaUser hu = hkfrest.findHKIDbyKID(kid).getIdDevices().getIduser();
+        
+        HobaUserFacadeREST hufrest = new HobaUserFacadeREST();
+        hufrest.remove(hu);
+        
+        return Response.status(Response.Status.OK).build();
+
+    }
 
     @Path("auth")
     @POST

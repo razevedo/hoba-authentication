@@ -88,6 +88,23 @@ public abstract class AbstractFacade<T> {
         }
         return null;
     }
+    
+    public T findChallengebyChallenge(String chalenge){
+        EntityManager em = getEntityManager();
+        CriteriaBuilder builder = em.getCriteriaBuilder();
+        
+        javax.persistence.criteria.CriteriaQuery cq = getEntityManager().getCriteriaBuilder().createQuery();
+        Root root = cq.from(entityClass);
+       cq.where(builder.equal(root.get("chalenge"), builder.parameter(String.class, "chalenge")));
+
+        Query query = getEntityManager().createQuery(cq);
+        query.setParameter("chalenge", chalenge);
+        
+        if(query.getResultList().size() > 0){
+            return (T)query.getResultList().get(0);
+        }
+        return null;
+    }
 
     public List<T> findAll() {
         javax.persistence.criteria.CriteriaQuery cq = getEntityManager().getCriteriaBuilder().createQuery();

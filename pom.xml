@@ -159,7 +159,7 @@
             </plugin>
         </plugins>
     
-    <finalName>hoba-autthentication</finalName>
+    <finalName>hoba-authentication</finalName>
     </build>
     
 </project>

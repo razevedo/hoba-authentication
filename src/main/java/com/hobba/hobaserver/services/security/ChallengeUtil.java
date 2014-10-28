@@ -47,26 +47,34 @@ public class ChallengeUtil {
         hc.setIsValid(Boolean.TRUE);
         hcfrest.create(hc);
 
-        return rand;
+        return new String(Base64.encodeBase64(rand.getBytes()));
     }
 
     public boolean isChallengeValid(HttpServletRequest request) {
 
         HobaKeys hk = new HobaKeys();
         HobaKeysFacadeREST hkfrest = new HobaKeysFacadeREST();
-
+        
         hk = hkfrest.findHKIDbyKID(getKID(request));
-        HobaChallenges hc = new HobaChallenges();
-        for (HobaChallenges hb_chalenge : hk.getHobaChallengesCollection()) {
-            hc = hb_chalenge;
-        }
-
+        
         HobaChallengesFacadeREST hcfrest = new HobaChallengesFacadeREST();
-        List list = hcfrest.findAll();
-        hc = (HobaChallenges) list.get(list.size() - 1);
-        for (int i = 0; i < list.size(); i++) {
-            hc = (HobaChallenges) list.get(i);
+        
+        String challenge = getChallenge(request);
+        if(challenge == null){
+            return false;
         }
+        
+        HobaChallenges hc = hcfrest.findChallengebyChallenge(challenge);
+        
+        if(!hc.getIsValid()){
+            return false;
+        }
+        if(hc.getExpiration() != null){
+           if(hc.getExpiration().after(new Date())){
+               return false;
+           } 
+        }
+        
         try {
 
             HobaDevices hd = hk.getIdDevices();
@@ -76,12 +84,26 @@ public class ChallengeUtil {
                 hd.setLastDate(new Date());
                 HobaDevicesFacadeREST hdfrest = new HobaDevicesFacadeREST();
                 hdfrest.create(hd);
+                
+                if(hc.getExpiration() == null){
+                    hc.setIsValid(Boolean.FALSE);
+                    hcfrest.edit(hc);
+                }
+                
                 return true;
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
         return false;
+    }
+    
+    private String getChallenge(HttpServletRequest request){
+        String header = request.getHeader("Authorized");
+        String[] headerParams = header.split("[.]");
+        String chalenge = headerParams[1];
+        
+        return new String(Base64.decodeBase64(chalenge));
     }
 
     private boolean verifySignature(HttpServletRequest request, HobaKeys hk) {
@@ -99,6 +121,7 @@ public class ChallengeUtil {
         String header = request.getHeader("Authorized");
         String[] headerParams = header.split("[.]");
         String kid = headerParams[0];
+        kid = new String(Base64.encodeBase64(kid.getBytes()));
         String chalenge = headerParams[1];
         String nonce = headerParams[2];
 
@@ -124,8 +147,9 @@ public class ChallengeUtil {
         String header = request.getHeader("Authorized");
         String[] headerParams = header.split("[.]");
         String kid = headerParams[0];
-        
         return kid;
+        
+        
     }
 
 }

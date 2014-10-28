@@ -48,14 +48,14 @@ function hobaRegistration() {
     createRSAKeys();
     getDeviceFields();
     var pub = KEYUTIL.getPEM(hoba_authentication.hoba_pubKey);
-
+    var register_kid = stob64(hoba_authentication.hoba_kid);
     $.ajax({
         type: "POST",
         url: hoba_authentication.hoba_server + "register",
         data: {
             pub: pub,
             kidtype: hoba_authentication.hoba_kidtype,
-            kid: hoba_authentication.hoba_kid,
+            kid: register_kid,
             didtype: hoba_authentication.hoba_didtype,
             did: hoba_authentication.did
         },
@@ -209,6 +209,28 @@ function hobaRemoveKid(kid) {
     return response;
 }
 
+function hobaZapData(kid) {
+    
+    var response;
+    $.ajax({
+        type: "DELETE",
+        url: hoba_authentication.hoba_server + "del_all",
+        data:{
+            kid: kid
+        },
+        async: false
+    }).always(
+            function (data, status, xhr) {
+                if (status == "success") {
+                    response = 0;
+                }else{
+                    response = -1;
+                }
+            }
+    );
+    return response;
+}
+
 
 
 function hobaGetChallenge() {
@@ -327,8 +349,10 @@ function hobaLogout() {
 }
 
 function hobaUnregister() {
+    var response = hobaRemoveKid(hoba_authentication.hoba_kid)
     logout();
     localStorage.clear();
+    return response;
 }
 
 function createRSAKeys() {
@@ -362,7 +386,8 @@ var origin = window.location.href;
     
     var alg = "1";
     
-    var kid_tbs = hoba_authentication.hoba_kid;
+    var kid_tbs = stob64(hoba_authentication.hoba_kid);
+    console.log(kid_tbs);
     var challenge_tbs = challenge;
     var tbs = nonce + " " + alg + " " + origin + " " + kid_tbs + " " + challenge;
     return tbs;

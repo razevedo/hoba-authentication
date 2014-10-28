@@ -8,8 +8,10 @@ package com.hobba.hobaserver.resources;
 import java.io.Serializable;
 import java.util.Collection;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -23,6 +25,8 @@ import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import org.codehaus.jackson.annotate.JsonIgnore;
+import org.eclipse.persistence.annotations.CascadeOnDelete;
+import org.eclipse.persistence.annotations.PrivateOwned;
 
 /**
  *
@@ -38,28 +42,27 @@ import org.codehaus.jackson.annotate.JsonIgnore;
     @NamedQuery(name = "HobaKeys.findByKid", query = "SELECT h FROM HobaKeys h WHERE h.kid = :kid"),
     @NamedQuery(name = "HobaKeys.findByPub", query = "SELECT h FROM HobaKeys h WHERE h.pub = :pub")})
 public class HobaKeys implements Serializable {
-    @OneToMany(mappedBy = "idKeys")
-    private Collection<HobaChallenges> hobaChallengesCollection;
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id_keys")
     private Integer idKeys;
-    @Size(max = 20)
-    @Column(name = "kidtype")
-    private String kidtype;
-    @Size(max = 40)
+    @Size(max = 255)
     @Column(name = "kid")
     private String kid;
+    @Size(max = 255)
+    @Column(name = "kidtype")
+    private String kidtype;
     @Size(max = 500)
-    @Column(name = "pub")
+    @Column(name = "pub", length = 500)
     private String pub;
-    @OneToMany(mappedBy = "idKeys")
-    private Collection<HobaChallenges> hobaChalengesCollection;
     @JoinColumn(name = "id_devices", referencedColumnName = "id_devices")
-    @ManyToOne
+    @ManyToOne(optional = false)
     private HobaDevices idDevices;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval=true, mappedBy = "idKeys")
+    @CascadeOnDelete
+    private Collection<HobaChallenges> hobaChallengesCollection;
 
     public HobaKeys() {
     }

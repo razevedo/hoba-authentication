@@ -97,7 +97,7 @@ public class HobaResource {
 
     }
     
-    @Path("del")
+    @Path("key")
     @DELETE
     @Produces(MediaType.TEXT_PLAIN)
     public Response deleteKey(@FormParam("kid") String kid) {
@@ -112,7 +112,7 @@ public class HobaResource {
 
     }
     
-    @Path("del_all")
+    @Path("user")
     @DELETE
     @Produces(MediaType.TEXT_PLAIN)
     public Response deleteAll(@FormParam("kid") String kid) {
@@ -144,13 +144,14 @@ public class HobaResource {
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public Response getToken(@QueryParam("kid") String kid, @QueryParam("expiration_time") String expiration_time) {
+        em.getEntityManagerFactory().getCache().evictAll();
         TokenUtil tokenUtil = new TokenUtil();
 
         String token = tokenUtil.getToken(kid, expiration_time);
         return Response.status(Response.Status.OK).entity(token).build();
     }
 
-    @Path("token_auth")
+    @Path("token")
     @POST
     @Produces(MediaType.TEXT_PLAIN)
     public Response authToken(@FormParam("token") String token, @FormParam("kid") String kid) {
@@ -209,7 +210,7 @@ public class HobaResource {
     @Path("user")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    public Response serUserData(
+    public Response setUserData(
             @FormParam("kid") String kid,
             @FormParam("field1") String field1,
             @FormParam("field2") String field2,

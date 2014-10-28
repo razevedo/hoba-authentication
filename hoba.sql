@@ -32,6 +32,10 @@ create table hoba_keys (
 	);
 
 drop table hoba_chalenges;
+drop table hoba_keys;
+drop table hoba_devices;
+drop table hoba_token;
+drop table hoba_user;
 
 create table hoba_challenges (
 	id_chalenge serial primary key,

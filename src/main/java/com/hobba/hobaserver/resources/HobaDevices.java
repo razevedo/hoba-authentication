@@ -9,8 +9,10 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -29,6 +31,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
+import org.eclipse.persistence.annotations.CascadeOnDelete;
+import org.eclipse.persistence.annotations.PrivateOwned;
 
 /**
  *
@@ -53,22 +57,23 @@ public class HobaDevices implements Serializable {
     @Basic(optional = false)
     @Column(name = "id_devices")
     private Integer idDevices;
-    @Size(max = 20)
+    @Size(max = 255)
     @Column(name = "did")
     private String did;
-    @Size(max = 25)
+    @Size(max = 255)
+    @Column(name = "didtype")
+    private String didtype;
+    @Size(max = 255)
     @Column(name = "ip_address")
     private String ipAddress;
     @Column(name = "last_date")
     @Temporal(TemporalType.TIMESTAMP)
     private Date lastDate;
-    @Size(max = 200)
-    @Column(name = "didtype")
-    private String didtype;
     @JoinColumn(name = "iduser", referencedColumnName = "id_user")
-    @ManyToOne
+    @ManyToOne(optional = false)
     private HobaUser iduser;
-    @OneToMany(mappedBy = "idDevices")
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval=true, mappedBy = "idDevices")
+    @CascadeOnDelete
     private Collection<HobaKeys> hobaKeysCollection;
 
     public HobaDevices() {

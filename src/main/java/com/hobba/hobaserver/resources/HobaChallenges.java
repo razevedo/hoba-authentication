@@ -43,7 +43,7 @@ public class HobaChallenges implements Serializable {
     @Basic(optional = false)
     @Column(name = "id_chalenge")
     private Integer idChalenge;
-    @Size(max = 200)
+    @Size(max = 255)
     @Column(name = "chalenge")
     private String chalenge;
     @Column(name = "expiration")
@@ -52,7 +52,7 @@ public class HobaChallenges implements Serializable {
     @Column(name = "is_valid")
     private Boolean isValid;
     @JoinColumn(name = "id_keys", referencedColumnName = "id_keys")
-    @ManyToOne
+    @ManyToOne(optional = false)
     private HobaKeys idKeys;
 
     public HobaChallenges() {

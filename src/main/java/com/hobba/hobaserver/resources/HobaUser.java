@@ -8,8 +8,10 @@ package com.hobba.hobaserver.resources;
 import java.io.Serializable;
 import java.util.Collection;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -21,6 +23,8 @@ import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import org.codehaus.jackson.annotate.JsonIgnore;
+import org.eclipse.persistence.annotations.CascadeOnDelete;
+import org.eclipse.persistence.annotations.PrivateOwned;
 
 /**
  *
@@ -42,18 +46,20 @@ public class HobaUser implements Serializable {
     @Basic(optional = false)
     @Column(name = "id_user")
     private Integer idUser;
-    @Size(max = 40)
+    @Size(max = 255)
     @Column(name = "field1")
     private String field1;
-    @Size(max = 40)
+    @Size(max = 255)
     @Column(name = "field2")
     private String field2;
-    @Size(max = 40)
+    @Size(max = 255)
     @Column(name = "field3")
     private String field3;
-    @OneToMany(mappedBy = "iduser")
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval=true, mappedBy = "iduser")
+    @CascadeOnDelete
     private Collection<HobaDevices> hobaDevicesCollection;
-    @OneToMany(mappedBy = "idUser")
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval=true, mappedBy = "idUser")
+    @CascadeOnDelete
     private Collection<HobaToken> hobaTokenCollection;
 
     public HobaUser() {

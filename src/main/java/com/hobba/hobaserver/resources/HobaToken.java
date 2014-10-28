@@ -8,6 +8,7 @@ package com.hobba.hobaserver.resources;
 import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -17,6 +18,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -43,17 +45,18 @@ public class HobaToken implements Serializable {
     @Basic(optional = false)
     @Column(name = "id_token")
     private Integer idToken;
-    @Size(max = 200)
-    @Column(name = "token")
-    private String token;
     @Column(name = "expiration")
     @Temporal(TemporalType.TIMESTAMP)
     private Date expiration;
     @Column(name = "is_valid")
     private Boolean isValid;
+    @Size(max = 255)
+    @Column(name = "token")
+    private String token;
     @JoinColumn(name = "id_user", referencedColumnName = "id_user")
-    @ManyToOne
+    @ManyToOne(optional = false)
     private HobaUser idUser;
+    
 
     public HobaToken() {
     }

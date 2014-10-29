@@ -333,7 +333,7 @@ Yes it is, but keep in mind you must use HTTPS.
 Good point. Your browser generates an ID and Public/private key. If you want to use in another browser (or device) you have to register again... In order to guarantee that the user remains the same, you (as a user) have to "enroll". We provide a time based token, encoded in a URL you can use in the other browser or device. As all the enrollments you only have to do this once (per browser/device)
 
 ###But there is another opensource implementation and it comes from better source...
-yes, there is another implementation [www.hoba.ie](https://hoba.ie/faq.html_ We decided to build our own implementation because we think that the actual implementation is not so modular as it could be, so we decided to create something others may use more simply.... not sure if we did, but we tried!
+yes, there is another implementation [www.hoba.ie](https://hoba.ie/faq.html) We decided to build our own implementation because we think that the actual implementation is not so modular as it could be, so we decided to create something others may use more simply.... not sure if we did, but we tried!
 
 _for more questions and not to repeat what is already well described go here [www.hoba.ie/faq.html](https://hoba.ie/faq.html)_
 

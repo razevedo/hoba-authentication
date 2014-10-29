@@ -27,11 +27,88 @@ TBD
 
 Usage
 ===================
-TBD
+Download the js libraries fingerprint.js, hoba_auth-min.js, jsrsasign-4.7.0-all-min.js, qrcode.min.js and include them in your html.
+To use the hoba_auth-min.js you need to start by initializing the object with the server endpoints urls.
+
+```html
+  var serverURL = "server_url:server_port/hoba-authentication/hoba/";
+    var initObj = {
+    protocol: "http://",
+    registerURL: serverURL + "register",
+    userURL: serverURL + "user",
+    uaURL: serverURL + "uas",
+    tokenURL: serverURL + "token",
+    keyURL: serverURL + "key",
+    challengeURL: serverURL + "getchal",
+    authURL: serverURL + "auth"
+  }
+
+  hoba.Init(initObj);
+```
+
+After initializing you can register the User Agent (UA) hoba.registration() and for logging in the hoba.login(). This two methods will return a 0 on success and a value less than 0 on error.
+
+```html
+  hoba.registration();
+  response = hoba.login();
+```
+
+The user can also logout, unregister his UA or even delete all his data from the server.
+
+```html
+  hoba.logout();
+  hoba.unregister();
+  hoba.zapData();
+```
+
+We also provide methods for adding and getting user info.
+
+```html
+  var field1;
+  var field2;
+  var field3;
+  hoba.setUserData(field1, field2, field3);
+  
+  hoba.getUserData();
+```
+As for login and registration both of these methods will return a value less than 0 on erro, but getUserData will return a object with the user info on success.
+
+```html
+Object {idUser: 1, field1: "field", field2: "field2", field3: "field3"} 
+```
+
+If you want you to use the same acount in a different UA you can generate an authentication token. The Application will generate a link with a token. You can copy this link to another UA and associate it to a previous user account.
+The link can be generated with:
+
+```html
+var token = hoba.getToken(expirationTime);
+```
+
+The method hoba.getToken(expirationTime) requires a parameter, expiration time. This parameter indicates how much time will the token be valid. If the expiration time is 0 the token will be valid for olny one time.
+
+After you pasted into another UA you can do the following proccess to get the token and bind the account.
+
+```html
+var token = hoba.getLinkToken();
+if (token != -1) {
+  hoba.bind(token);
+}
+```
+
+Finaly we provide two methods for checking if the UA is registered with hoba and if the user has logged in
+
+```html
+hoba.isRegisted();
+hoba.isLoggin();
+```
+
+These two method will return true or false.
+
 
 Samples
 ===================
-TBD
+
+We provide a fully functional example. To test our sample you need a tomcat server (we have tested with tomcat 8.0.12) and postgresql with a database created called hoba. Then you can clone our project and simply run it.
 
 FAQ
 ===================

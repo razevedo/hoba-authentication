@@ -33,11 +33,19 @@ Samples
 ===================
 TBD
 
+FAQ
+===================
+###Is this secure?
+Yes it is, but keep in mind you must use HTTPS.  
+
+###How it works with multi-devices and different browsers?
+Good point. Your browser generates an ID and Public/private key. If you want to use in another browser (or device) you have to register again... In order to guarantee that the user remains the same, you (as a user) have to "enroll". We provide a time based token, encoded in a URL you can use in the other browser or device. As all the enrollments you only have to do this once (per browser/device)
+
 Licence (MIT)
 ===================
 This code has been done within [PT Inovação e Sistemas](http://www.ptinovacao.pt) project. 
 
-Copyright (c) 2014 Fábio Gonçalves & Ricardo Azevedo 
+Copyright (c) 2014 Fábio Gonçalves & [Ricardo Azevedo](http://pt.linkedin.com/in/razevedoper/)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 

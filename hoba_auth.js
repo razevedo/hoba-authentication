@@ -411,7 +411,7 @@ hoba.logout = function () {
     sessionStorage.clear();
 }
 
-hoba.unregister = function (keyURL) {
+hoba.unregister = function () {
     var response = hoba.removeKid(hoba.hoba_kid)
     hoba.logout();
     localStorage.clear();

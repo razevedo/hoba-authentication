@@ -109,6 +109,88 @@ Samples
 ===================
 
 We provide a fully functional example. To test our sample you need a tomcat server (we have tested with tomcat 8.0.12) and postgresql with a database created called hoba. Then you can clone our project and simply run it.
+In the following code block is a simple hoba client in html with javascript. This sample only implements some basic methods: registration, logging in, logout, unregister and zap data.
+
+```html
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>hoba-authentication sample</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.9.0/jquery-ui.min.js"></script>
+        <script language="JavaScript" type="text/javascript" src="js/jsrsasign-4.7.0-all-min.js"></script>
+        
+        <script type="text/javascript" src="js/fingerprint.js"></script>
+
+
+        <script type="text/javascript" src="js/qrcode.min.js"></script>
+        <script type="text/javascript" src="js/hoba_auth.js"></script>
+    </head>
+    <body>
+        <h1>hoba-authentication sample</h1>
+        <button onclick="register()">Register</button>
+        <button onclick="login()">Login</button>
+        <button onclick="logout()">Logout</button>
+        <button onclick="unregister()">Unregister</button>
+        <button onclick="zapData()">Zap Data</button>
+        <div id="response"></div>
+
+        <script type="text/javascript">
+            var serverURL = "localhost:8080/hoba-authentication/hoba/";
+
+            var initObj = {
+                protocol: "http://",
+                registerURL: serverURL + "register",
+                userURL: serverURL + "user",
+                uaURL: serverURL + "uas",
+                tokenURL: serverURL + "token",
+                keyURL: serverURL + "key",
+                challengeURL: serverURL + "getchal",
+                authURL: serverURL + "auth"
+            }
+            
+            $(document).ready(function (){
+                hoba.Init(initObj);
+            });
+            function register(){
+                if(hoba.registration() == 0){
+                    $('#response').text("Registration successfull");
+                }else{
+                    $('#response').text("Error in registration");
+                }
+            }
+            function login(){
+                if(hoba.login() == 0){
+                    $('#response').text("Login Successfull");
+                }else{
+                    $('#response').text("Error logging in");
+                }
+            }
+            function logout(){
+                $('#response').text("Logout");
+                hoba.logout();
+                
+            }
+            function unregister(){
+                if(hoba.unregister() == 0){
+                    $('#response').text("Unregister successfull");
+                }else{
+                    $('#response').text("Error unregistering");
+                }
+            }
+            function  zapData(){
+                if(hoba.zapData() == 0){
+                    $('#response').text("Zaping data successfull");
+                }else{
+                    $('#response').text("Error zapping data");
+                }
+            }
+        </script>
+    </body>
+</html>
+
+```
 
 FAQ
 ===================

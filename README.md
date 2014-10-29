@@ -23,7 +23,139 @@ We believe the problem is not with the username/password scheme itself, or the u
 
 How it works
 ===================
-TBD
+This project uses a client with javascript and a server with a rest api. The hoba_authentication.js methods are described int the Usage section. The rest api is as follows:
+
+POST hoba/register
+------------------
+Registers an UA in the hoba database.
+
+**Parameters**
+
+* *pub*: UA generated Public Key;
+* *kidtype*: The key type;
+* *kide*: The Public key ID;
+* *didtype*: Device Type;
+* *did*: Device id;
+
+**Returns**
+
+*HTTP Header*: Hobareg-val = regok
+
+POST hoba/getchal
+------------------
+Allows the UA to get a challenge to be used for authentication
+
+**Parameters**
+
+* *kid*: The Public Key ID
+
+**Returns**
+
+*HTTP Header*: 
+* Authentication = HOBA
+* challenge = [generated_challenge]
+* max-age = [expiration_time]
+
+POST hoba/auth
+------------------
+Authenticates an UA
+
+**Parameters**
+
+* *Authorized*: HOBA-RES
+
+**Returns**
+
+*HTTP Response Status*
+
+* On success: 200
+* On Failure: 400
+
+DELETE hoba/key
+------------------
+Deltes an UA key ensuring UA unregistration
+
+**Parameters**
+
+* *kid*: Public Key ID
+
+**Returns**
+
+*HTTP Response Status*
+
+* On success: 200
+* On Failure: 500
+
+DELETE hoba/user
+------------------
+Deltes all the user data
+
+**Parameters**
+
+* *kid*: Public Key ID
+
+**Returns**
+
+*HTTP Response Status*
+
+
+* On success: 200
+* On Failure: 500
+
+GET hoba/user
+------------------
+Gets the user data
+
+**Parameters**
+
+* *kid*: Public Key ID
+
+**Returns**
+
+List containing all the connections: {"idUser":1,"field1":"","field2":"","field3":""}
+
+
+GET hoba/token
+------------------
+Gets a token that can be used for binding another UA
+
+**Parameters**
+
+* *kid*: Public Key ID
+
+**Returns**
+
+*Token*
+
+POST hoba/token
+------------------
+Verifies the token validity and binds the UA
+
+**Parameters**
+
+* *token*: The server generatated token
+* *kid*: Public Key ID
+
+**Returns**
+
+*HTTP Response Status*
+
+* On success: 200
+* On Failure: 400
+
+POST hoba/uas
+------------------
+Returns the several several UAs where the same user as been connected
+
+**Parameters**
+
+* *kid*: Public Key ID
+
+**Returns**
+
+List containing all the connections: ["deviceType": "", "ipAddress": "", "date": "", "kid": ""]
+
+
 
 Usage
 ===================

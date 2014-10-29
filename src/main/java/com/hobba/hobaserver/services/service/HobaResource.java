@@ -181,7 +181,6 @@ public class HobaResource {
         HobaConnections hc;
         for(HobaDevices hd: hds){
             List<HobaKeys> aux = new ArrayList<HobaKeys>(hd.getHobaKeysCollection());
-            System.out.println("aux.get(aux.size()-1).getKid(): "+aux.get(aux.size()-1).getKid());
             hc = new HobaConnections(hd.getDidtype(), hd.getIpAddress(), hd.getLastDate(), aux.get(aux.size()-1).getKid());
             hcs.add(hc);
         }

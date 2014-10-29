@@ -4,88 +4,129 @@
  * and open the template in the editor.
  */
 
-var hoba_authentication = {};
-hoba_authentication.hoba_pubKey;
-hoba_authentication.hoba_privKey;
-hoba_authentication.hoba_kidtype;
-hoba_authentication.hoba_kid;
-hoba_authentication.hoba_didtype;
-hoba_authentication.hoba_did;
-hoba_authentication.isInit;
-hoba_authentication.challenge;
-hoba_authentication.maxAge;
+window.log = function () {
+    log.history = log.history || [];   // store logs to an array for reference
+    log.history.push(arguments);
+    if (this.console) {
+        console.log(Array.prototype.slice.call(arguments));
+    }
+};
+
+var hoba = {};
+hoba.hoba_pubKey;
+hoba.hoba_privKey;
+hoba.hoba_kidtype;
+hoba.hoba_kid;
+hoba.hoba_didtype;
+hoba.hoba_did;
+hoba.isInit;
+hoba.challenge;
+hoba.maxAge;
+
+hoba.settings = {
+    protocol: "http://",
+    registerURL: "",
+    userURL: "",
+    uaURL: "",
+    tokenURL: "",
+    keyURL: "",
+    challengeURL: "",
+    authURL: ""
+}
 
 
+hoba.Init = function (initObj) {
 
-function hobaInit(serverurl) {
+    hoba.isInit = true;
+    if (hoba.isRegisted()) {
+        hoba.getLocalStorageData();
+    }
 
-    hoba_authentication.hoba_server = serverurl;
-    hoba_authentication.isInit = true;
-    if (hobaIsRegisted()) {
-        getLocalStorageData();
+    hoba.checkSettings(initObj)
+    hoba.settings = initObj;
+    hoba.checkURLs();
+}
+
+hoba.checkURLs = function () {
+    for (var keys in hoba.settings) {
+        if (keys != "protocolo") {
+            if (hoba.settings[keys].indexOf("http://") < 0 || hoba.settings[keys].toString().indexOf("http://") < 0) {
+                hoba.settings[keys] = hoba.settings.protocol + hoba.settings[keys];
+            }
+        }
     }
 }
 
-function getLocalStorageData() {
-    hoba_authentication.hoba_privKey = KEYUTIL.getKey(localStorage.getItem("hoba_privKey"));
-    hoba_authentication.hoba_pubKey = KEYUTIL.getKey(localStorage.getItem("hoba_pubKey"));
-    hoba_authentication.hoba_kid = localStorage.getItem("hoba_kid");
+hoba.checkSettings = function (initObj) {
+    var i = 0;
+    for (var keys in initObj) {
+        if (!hoba.settings.hasOwnProperty(keys)) {
+            window.log("hoba.settings does not contain the key " + keys);
+
+        } else
+            i++;
+    }
+
+    if (i != 8) {
+        window.log("hoba.settings has 8 fields, initObj has " + i);
+    }
 }
-/*
- * 
- * return -3 dados não inicializados;
- * return -2 servidor não encontrado
- * return -1 probemas durante o registo
- * return  0 registo com sucesso 
- */
-function hobaRegistration(registerURL) {
+
+hoba.getLocalStorageData = function () {
+    hoba.hoba_privKey = KEYUTIL.getKey(localStorage.getItem("hoba_privKey"));
+    hoba.hoba_pubKey = KEYUTIL.getKey(localStorage.getItem("hoba_pubKey"));
+    hoba.hoba_kid = localStorage.getItem("hoba_kid");
+}
+
+hoba.registration = function () {
     var response;
-    if (!hoba_authentication.isInit) {
+    if (!hoba.isInit) {
         return -3;
     }
-    createRSAKeys();
-    getDeviceFields();
-    var pub = KEYUTIL.getPEM(hoba_authentication.hoba_pubKey);
-    var register_kid = stob64(hoba_authentication.hoba_kid);
+    hoba.createRSAKeys();
+    hoba.getDeviceFields();
+    var pub = KEYUTIL.getPEM(hoba.hoba_pubKey);
+    var register_kid = stob64(hoba.hoba_kid);
     $.ajax({
         type: "POST",
-        url: registerURL,
+        url:  hoba.settings.registerURL,
         data: {
             pub: pub,
-            kidtype: hoba_authentication.hoba_kidtype,
+            kidtype: hoba.hoba_kidtype,
             kid: register_kid,
-            didtype: hoba_authentication.hoba_didtype,
-            did: hoba_authentication.did
+            didtype: hoba.hoba_didtype,
+            did: hoba.did
         },
         async: false
     }).always(function (data, status, xhr) {
-        response = handleRegisterReponse(status, xhr);
+        response = hoba.handleRegisterReponse(status, xhr);
     });
     return response;
 
 }
 
-function hobaLogin(challengeURL, authURL) {
-    var challResponse = hobaGetChallenge(challengeURL);
+hoba.login = function () {
+    var challResponse = hoba.getChallenge(hoba.settings.challengeURL);
 
     if (challResponse != 0) {
         return challResponse;
     }
-    var signedClientResult = getClientResult(hoba_authentication.challenge);
-    return hobaAuth(signedClientResult,authURL);
+    var signedClientResult = hoba.getClientResult(hoba.challenge);
+    return hoba.auth(signedClientResult);
 }
 
-function hobaGetUserData(userURL) {
+hoba.getUserData = function () {
     var response;
     $.ajax({
         type: "GET",
-        url: userURL + "?kid=" + hoba_authentication.hoba_kid,
+        url:  hoba.settings.userURL + "?kid=" + hoba.hoba_kid,
         async: false
     }).always(function (data, status, xhr) {
 
         if (status == "success") {
             response = data;
         } else {
+            window.log("Error getting user data");
             response = -1;
         }
     });
@@ -93,14 +134,14 @@ function hobaGetUserData(userURL) {
     return response;
 }
 
-function hobaSetUserData(field1, field2, field3, userURL) {
+hoba.setUserData = function (field1, field2, field3) {
     var response;
 
     $.ajax({
         type: "POST",
-        url: userURL,
+        url:  hoba.settings.userURL,
         data: {
-            kid: hoba_authentication.hoba_kid,
+            kid: hoba.hoba_kid,
             field1: field1,
             field2: field2,
             field3: field3
@@ -110,19 +151,20 @@ function hobaSetUserData(field1, field2, field3, userURL) {
         if (status == "success") {
             response = 0;
         } else {
+            window.log("Error seting userData");
             response = -1;
         }
     });
     return response;
 }
 
-function hobaGetConnections(uaURL) {
+hoba.getConnections = function () {
     var response;
     $.ajax({
         type: "GET",
-        url: uaURL ,
+        url: hoba.settings.uaURL,
         data: {
-            kid: hoba_authentication.hoba_kid
+            kid: hoba.hoba_kid
         },
         async: false
     }).always(
@@ -131,6 +173,7 @@ function hobaGetConnections(uaURL) {
                 if (status == "success") {
                     response = data;
                 } else {
+                    window.log("Error geting connections");
                     response = -1;
                 }
             }
@@ -139,20 +182,21 @@ function hobaGetConnections(uaURL) {
     return response;
 }
 
-function hobaGetToken(expirationTime, tokenURL) {
+hoba.getToken = function (expirationTime) {
     var response;
     var origin = window.location.href;
     origin = origin.substring(0, origin.length - 1);
 
     $.ajax({
         type: "GET",
-        url: tokenURL + "?kid=" + hoba_authentication.hoba_kid + "&expiration_time=" + expirationTime,
+        url:  hoba.settings.tokenURL + "?kid=" + hoba.hoba_kid + "&expiration_time=" + expirationTime,
         async: false
     }).always(
             function (data, status, xhr) {
                 if (status == "success") {
                     response = origin + "?token=" + data;
                 } else {
+                    window.log("Erro getting token");
                     response = -1;
                 }
             }
@@ -161,34 +205,57 @@ function hobaGetToken(expirationTime, tokenURL) {
     return response;
 }
 
-function hobaBind(token, tokenURL) {
+hoba.bind = function (token) {
     var response;
-    $.ajax({
-        type: "POST",
-        url: tokenURL,
-        data: {
-            kid: hoba_authentication.hoba_kid,
-            token: token
-        },
-        async: false
-    }).always(
-            function (data, status, xhr) {
-                if (status == "success") {
-                    response = 0;
-                } else {
-                    response = -1;
+    var continueBind = hoba.bindOperations();
+    if (continueBind) {
+        $.ajax({
+            type: "POST",
+            url:  hoba.settings.tokenURL,
+            data: {
+                kid: hoba.hoba_kid,
+                token: token
+            },
+            async: false
+        }).always(
+                function (data, status, xhr) {
+                    if (status == "success") {
+                        response = 0;
+                    } else {
+                        window.log("Erro binding")
+                        response = -1;
+                    }
                 }
-            }
-    );
+        );
+    } else {
+        window.log("Operation canceled by user");
+        response = -1;
+    }
+
     return response;
+
 }
 
-function hobaRemoveKid(kid, keyURL) {
+hoba.bindOperations = function () {
+
+    var resp = false;
+    if (hoba.isRegisted()) {
+        resp = confirm("You already have another account registed in in this browser. Do you want to associate it with another user?");
+    } else {
+        hoba.registration();
+        resp = true;
+    }
+    return resp;
+
+
+}
+
+hoba.removeKid = function (kid) {
 
     var response;
     $.ajax({
         type: "DELETE",
-        url: keyURL,
+        url:  hoba.settings.keyURL,
         data: {
             kid: kid
         },
@@ -198,6 +265,7 @@ function hobaRemoveKid(kid, keyURL) {
                 if (status == "success") {
                     response = 0;
                 } else {
+
                     response = -1;
                 }
             }
@@ -205,72 +273,77 @@ function hobaRemoveKid(kid, keyURL) {
     return response;
 }
 
-function hobaZapData(kid, userURL) {
-
+hoba.zapData = function () {
     var response;
     $.ajax({
         type: "DELETE",
-        url: userURL,
+        url:  hoba.settings.userURL,
         data: {
-            kid: kid
+            kid: hoba.hoba_kid
         },
         async: false
     }).always(
             function (data, status, xhr) {
                 if (status == "success") {
                     response = 0;
+                    localStorage.clear();
+                    hoba.logout();
                 } else {
+                    window.log("Error zapping user data");
                     response = -1;
                 }
             }
     );
+
     return response;
 }
 
 
 
-function hobaGetChallenge(challengeURL) {
+hoba.getChallenge = function () {
     var response;
     $.ajax({
         type: "POST",
-        url: challengeURL,
-        data: {kid: hoba_authentication.hoba_kid},
+        url:  hoba.settings.challengeURL,
+        data: {kid: hoba.hoba_kid},
         async: false
     }).always(function (data, status, xhr) {
         if (status == "success") {
             var authType = xhr.getResponseHeader("Authentication");
             if (authType == "HOBA") {
-                hoba_authentication.challenge = xhr.getResponseHeader("challenge");
-                hoba_authentication.maxAge = xhr.getResponseHeader("max-age");
+                hoba.challenge = xhr.getResponseHeader("challenge");
+                hoba.maxAge = xhr.getResponseHeader("max-age");
                 response = 0;
 
             } else {
+                window.log("Wrong auth type in http header");
                 response - 2;
             }
         } else {
+            window.log("Erro getting challenge");
             response - 3;
         }
     });
     return response;
 }
 
-function getClientResult(challenge) {
-    var nonce = makeRandString();
-    var tbs = getHOBATBS(challenge, nonce);
+hoba.getClientResult = function (challenge) {
+    var nonce = hoba.makeRandString();
+    var tbs = hoba.getHOBATBS(challenge, nonce);
     var sig = new KJUR.crypto.Signature({"alg": "SHA1withRSA", "prov": "cryptojs/jsrsa"});
-    sig.initSign(hoba_authentication.hoba_privKey);
+    sig.initSign(hoba.hoba_privKey);
     sig.updateString(tbs);
     var signature = sig.sign();
 
     var base64Sig = stob64(signature);
-    var client_result = hoba_authentication.hoba_kid + "." + challenge + "." + nonce + "." + base64Sig;
+    var client_result = hoba.hoba_kid + "." + challenge + "." + nonce + "." + base64Sig;
     return client_result;
 }
 
-function hobaAuth(signedClientResult, authURL) {
+hoba.auth = function (signedClientResult) {
     var response;
     $.ajax({
-        url: authURL,
+        url: hoba.settings.authURL,
         type: "POST",
         headers: {
             "Authorized": signedClientResult
@@ -283,6 +356,7 @@ function hobaAuth(signedClientResult, authURL) {
                     response = 0;
                 } else {
                     sessionStorage.removeItem("loggedin");
+                    window.log("Error in the authentication");
                     response = -1;
                 }
             });
@@ -290,24 +364,26 @@ function hobaAuth(signedClientResult, authURL) {
 }
 
 
-function handleRegisterReponse(status, xhr) {
+hoba.handleRegisterReponse = function (status, xhr) {
     if (status === "success") {
         var hobareg = xhr.getResponseHeader("Hobareg-val");
 
         if (hobareg === "regok") {
-            localStorage.setItem("hoba_privKey", KEYUTIL.getPEM(hoba_authentication.hoba_privKey, "PKCS8PRV"));
-            localStorage.setItem("hoba_pubKey", KEYUTIL.getPEM(hoba_authentication.hoba_pubKey));
-            localStorage.setItem("hoba_kid", hoba_authentication.hoba_kid);
+            localStorage.setItem("hoba_privKey", KEYUTIL.getPEM(hoba.hoba_privKey, "PKCS8PRV"));
+            localStorage.setItem("hoba_pubKey", KEYUTIL.getPEM(hoba.hoba_pubKey));
+            localStorage.setItem("hoba_kid", hoba.hoba_kid);
             return 0;
         } else {
+            window.log("Register in process");
             return -1;
         }
     } else {
+        window.log("Error in registration");
         return -2;
     }
 }
 
-function hobaIsRegisted() {
+hoba.isRegisted = function () {
     var priv = localStorage.getItem("hoba_privKey");
     var pub = localStorage.getItem("hoba_pubKey");
     var kid = localStorage.getItem("hoba_kid");
@@ -322,7 +398,7 @@ function hobaIsRegisted() {
 
 
 
-function hobaIsLoggin() {
+hoba.isLoggin = function () {
     var loggedin = sessionStorage.getItem("loggedin");
     if (loggedin == null) {
         return false;
@@ -331,32 +407,32 @@ function hobaIsLoggin() {
     return Boolean(loggedin);
 }
 
-function hobaLogout() {
+hoba.logout = function () {
     sessionStorage.clear();
 }
 
-function hobaUnregister(keyURL) {
-    var response = hobaRemoveKid(hoba_authentication.hoba_kid, keyURL)
-    hobaLogout();
+hoba.unregister = function (keyURL) {
+    var response = hoba.removeKid(hoba.hoba_kid)
+    hoba.logout();
     localStorage.clear();
     return response;
 }
 
-function createRSAKeys() {
-    hoba_authentication.hoba_kidtype = 2;
+hoba.createRSAKeys = function () {
+    hoba.hoba_kidtype = 2;
     var keys = KEYUTIL.generateKeypair("RSA", 1024);
-    hoba_authentication.hoba_pubKey = keys.pubKeyObj;
-    hoba_authentication.hoba_privKey = keys.prvKeyObj;
-    var pub = KEYUTIL.getPEM(hoba_authentication.hoba_pubKey);
-    hoba_authentication.hoba_kid = getKeyID(pub);
+    hoba.hoba_pubKey = keys.pubKeyObj;
+    hoba.hoba_privKey = keys.prvKeyObj;
+    var pub = KEYUTIL.getPEM(hoba.hoba_pubKey);
+    hoba.hoba_kid = getKeyID(pub);
 }
 
-function getDeviceFields() {
-    hoba_authentication.hoba_didtype = navigator.userAgent;
-    hoba_authentication.hoba_did = new Fingerprint().get();
+hoba.getDeviceFields = function () {
+    hoba.hoba_didtype = navigator.userAgent;
+    hoba.hoba_did = new Fingerprint().get();
 }
 
-function makeRandString()
+hoba.makeRandString = function ()
 {
     var text = "";
     var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -365,7 +441,7 @@ function makeRandString()
     return stob64(text);
 }
 
-function getHOBATBS(challenge, nonce) {
+hoba.getHOBATBS = function (challenge, nonce) {
     var origin = window.location.href;
     origin = origin.substring(0, origin.length - 1);
 
@@ -373,14 +449,14 @@ function getHOBATBS(challenge, nonce) {
 
     var alg = "1";
 
-    var kid_tbs = stob64(hoba_authentication.hoba_kid);
-    
+    var kid_tbs = stob64(hoba.hoba_kid);
+
     var challenge_tbs = challenge;
     var tbs = nonce + " " + alg + " " + origin + " " + kid_tbs + " " + challenge;
     return tbs;
 }
 
-function hobaGetLinkToken() {
+hoba.getLinkToken = function () {
     var r = true;
 
     var token = window.location.search.substring(1);

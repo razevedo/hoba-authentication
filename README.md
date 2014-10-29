@@ -39,7 +39,9 @@ Registers an UA in the hoba database.
 
 **Returns**
 
-*HTTP Header*: Hobareg-val = regok
+*HTTP Header*: 
+
+* Hobareg-val
 
 POST hoba/getchal
 ------------------

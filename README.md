@@ -332,17 +332,17 @@ FAQ
 Yes it is, but keep in mind you must use HTTPS.  
 
 ###How it works with multi-devices and different browsers?
-Good point. Your browser generates an ID and Public/private key. If you want to use in another browser (or device) you have to register again... In order to guarantee that the user remains the same, you (as a user) have to "enroll". We provide a time based token, encoded in a URL you can use in the other browser or device. As all the enrollments you only have to do this once (per browser/device)
+Good point. Your browser generates an ID and Public/private key. A time based token, encoded in a URL is provided by the server, so the user can use it when accessing the service form other browser or device (a QR code with the URL is also available). As all the enrollments you only have to do this once (per browser/device).
 
-###But there is another opensource implementation and it comes from better source...
-yes, there is another implementation [www.hoba.ie](https://hoba.ie/faq.html) We decided to build our own implementation because we think that the actual implementation is not so modular as it could be, so we decided to create something others may use more simply.... not sure if we did, but we tried!
+###But there is another opensource implementation and it comes from more trustful source...
+yes, there is another implementation [www.hoba.ie](https://hoba.ie/faq.html). We decided to build our own implementation because we think that the actual implementation is not so modular as it could be, so we decided to create something others may use more simply.... not sure if we did, but we tried!
 
 _for more questions and not to repeat what is already well described go here [www.hoba.ie/faq.html](https://hoba.ie/faq.html)_
 
+######This code has been done within a [PT Inovação e Sistemas](http://www.ptinovacao.pt) project. 
+
 Licence (MIT)
 ===================
-This code has been done within a [PT Inovação e Sistemas](http://www.ptinovacao.pt) project. 
-
 Copyright (c) 2014 Fábio Gonçalves & [Ricardo Azevedo](http://pt.linkedin.com/in/razevedoper/)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:

@@ -31,7 +31,8 @@ hoba.settings = {
     tokenURL: "",
     keyURL: "",
     challengeURL: "",
-    authURL: ""
+    authURL: "",
+    logoutURL: ""
 }
 
 
@@ -67,8 +68,8 @@ hoba.checkSettings = function (initObj) {
             i++;
     }
 
-    if (i != 8) {
-        window.log("hoba.settings has 8 fields, initObj has " + i);
+    if (i != 9) {
+        window.log("hoba.settings has 9 fields, initObj has " + i);
     }
 }
 
@@ -89,7 +90,7 @@ hoba.registration = function () {
     var register_kid = stob64(hoba.hoba_kid);
     $.ajax({
         type: "POST",
-        url:  hoba.settings.registerURL,
+        url: hoba.settings.registerURL,
         data: {
             pub: pub,
             kidtype: hoba.hoba_kidtype,
@@ -115,19 +116,25 @@ hoba.login = function () {
     return hoba.auth(signedClientResult);
 }
 
+
+
 hoba.getUserData = function () {
     var response;
     $.ajax({
         type: "GET",
-        url:  hoba.settings.userURL + "?kid=" + hoba.hoba_kid,
+        url: hoba.settings.userURL + "?kid=" + hoba.hoba_kid,
         async: false
     }).always(function (data, status, xhr) {
 
         if (status == "success") {
             response = data;
-        } else {
-            window.log("Error getting user data");
+        } else if (data.getResponseHeader("Authenticate") == "HOBA") {
+
+            window.log("Session Expired");
             response = -1;
+        } else {
+            window.log("Unknown Error");
+            response = -2;
         }
     });
 
@@ -139,7 +146,7 @@ hoba.setUserData = function (field1, field2, field3) {
 
     $.ajax({
         type: "POST",
-        url:  hoba.settings.userURL,
+        url: hoba.settings.userURL,
         data: {
             kid: hoba.hoba_kid,
             field1: field1,
@@ -150,9 +157,12 @@ hoba.setUserData = function (field1, field2, field3) {
     }).always(function (data, status, xhr) {
         if (status == "success") {
             response = 0;
-        } else {
-            window.log("Error seting userData");
+        } else if (xhr.getResponseHeader("Authenticate") == "HOBA") {
+            window.log("Session Expired");
             response = -1;
+        } else {
+            window.log("Unkown Error");
+            response = -2;
         }
     });
     return response;
@@ -172,9 +182,12 @@ hoba.getConnections = function () {
 
                 if (status == "success") {
                     response = data;
-                } else {
-                    window.log("Error geting connections");
+                } else if (data.getResponseHeader("Authenticate") == "HOBA") {
+                    window.log("Session Expired");
                     response = -1;
+                } else {
+                    window.log("Unkown Error");
+                    response = -2;
                 }
             }
     );
@@ -189,15 +202,18 @@ hoba.getToken = function (expirationTime) {
 
     $.ajax({
         type: "GET",
-        url:  hoba.settings.tokenURL + "?kid=" + hoba.hoba_kid + "&expiration_time=" + expirationTime,
+        url: hoba.settings.tokenURL + "?kid=" + hoba.hoba_kid + "&expiration_time=" + expirationTime,
         async: false
     }).always(
             function (data, status, xhr) {
                 if (status == "success") {
                     response = origin + "?token=" + data;
-                } else {
-                    window.log("Erro getting token");
+                } else if (data.getResponseHeader("Authenticate") == "HOBA") {
+                    window.log("Session Expired");
                     response = -1;
+                } else {
+                    window.log("Unkown Error");
+                    response = -2;
                 }
             }
     );
@@ -211,7 +227,7 @@ hoba.bind = function (token) {
     if (continueBind) {
         $.ajax({
             type: "POST",
-            url:  hoba.settings.tokenURL,
+            url: hoba.settings.tokenURL,
             data: {
                 kid: hoba.hoba_kid,
                 token: token
@@ -221,9 +237,12 @@ hoba.bind = function (token) {
                 function (data, status, xhr) {
                     if (status == "success") {
                         response = 0;
-                    } else {
-                        window.log("Erro binding")
+                    } else if (data.getResponseHeader("Authenticate") == "HOBA") {
+                        window.log("Session Expired");
                         response = -1;
+                    } else {
+                        window.log("Unkown Error");
+                        response = -2;
                     }
                 }
         );
@@ -255,7 +274,7 @@ hoba.removeKid = function (kid) {
     var response;
     $.ajax({
         type: "DELETE",
-        url:  hoba.settings.keyURL,
+        url: hoba.settings.keyURL,
         data: {
             kid: kid
         },
@@ -264,12 +283,42 @@ hoba.removeKid = function (kid) {
             function (data, status, xhr) {
                 if (status == "success") {
                     response = 0;
-                } else {
-
+                } else if (data.getResponseHeader("Authenticate") == "HOBA") {
+                    window.log("Session Expired");
                     response = -1;
+                } else {
+                    window.log("Unkown Error");
+                    response = -2;
                 }
             }
     );
+    return response;
+}
+
+hoba.logout = function () {
+
+    var response;
+    $.ajax({
+        type: "POST",
+        url: hoba.settings.logoutURL,
+        data: {
+            kid: hoba.hoba_kid
+        },
+        async: false
+    }).always(
+            function (data, status, xhr) {
+                if (status == "success") {
+                    response = 0;
+                } else if (data.getResponseHeader("Authenticate") == "HOBA") {
+                    window.log("Session Expired");
+                    response = -1;
+                } else {
+                    window.log("Unkown Error");
+                    response = -2;
+                }
+            }
+    );
+    sessionStorage.clear();
     return response;
 }
 
@@ -277,7 +326,7 @@ hoba.zapData = function () {
     var response;
     $.ajax({
         type: "DELETE",
-        url:  hoba.settings.userURL,
+        url: hoba.settings.userURL,
         data: {
             kid: hoba.hoba_kid
         },
@@ -288,9 +337,12 @@ hoba.zapData = function () {
                     response = 0;
                     localStorage.clear();
                     hoba.logout();
-                } else {
-                    window.log("Error zapping user data");
+                } else if (data.getResponseHeader("Authenticate") == "HOBA") {
+                    window.log("Session Expired");
                     response = -1;
+                } else {
+                    window.log("Unkown Error");
+                    response = -2;
                 }
             }
     );
@@ -304,7 +356,7 @@ hoba.getChallenge = function () {
     var response;
     $.ajax({
         type: "POST",
-        url:  hoba.settings.challengeURL,
+        url: hoba.settings.challengeURL,
         data: {kid: hoba.hoba_kid},
         async: false
     }).always(function (data, status, xhr) {
@@ -320,7 +372,7 @@ hoba.getChallenge = function () {
                 response - 2;
             }
         } else {
-            window.log("Erro getting challenge");
+            window.log("Error getting challenge");
             response - 3;
         }
     });
@@ -403,18 +455,17 @@ hoba.isLoggin = function () {
     if (loggedin == null) {
         return false;
     }
-
     return Boolean(loggedin);
 }
 
-hoba.logout = function () {
-    sessionStorage.clear();
-}
+
 
 hoba.unregister = function () {
     var response = hoba.removeKid(hoba.hoba_kid)
-    hoba.logout();
-    localStorage.clear();
+    if (response == 0) {
+        hoba.logout();
+        localStorage.clear();
+    }
     return response;
 }
 

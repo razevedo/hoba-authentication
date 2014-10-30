@@ -35,7 +35,7 @@ public class SessionUtil {
             hobaSession.setIsvalid(Boolean.TRUE);
             
             long dateL = new Date().getTime();
-            Date initDate = new Date(dateL+(60000*5));
+            Date initDate = new Date(dateL+(60000*30));
             
             hobaSession.setSessionIni(initDate);
             HobaSessionFacadeREST hsfrest = new HobaSessionFacadeREST();

@@ -52,7 +52,7 @@ public class HobaChallenges implements Serializable {
     @Column(name = "is_valid")
     private Boolean isValid;
     @JoinColumn(name = "id_keys", referencedColumnName = "id_keys")
-    @ManyToOne(optional = false)
+    @ManyToOne
     private HobaKeys idKeys;
 
     public HobaChallenges() {
@@ -124,7 +124,7 @@ public class HobaChallenges implements Serializable {
 
     @Override
     public String toString() {
-        return "com.hobba.hobaserver.services.HobaChallenges[ idChalenge=" + idChalenge + " ]";
+        return "com.hobba.hobaserver.resources.HobaChallenges[ idChalenge=" + idChalenge + " ]";
     }
     
 }

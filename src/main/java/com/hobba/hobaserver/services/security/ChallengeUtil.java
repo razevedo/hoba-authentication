@@ -90,6 +90,11 @@ public class ChallengeUtil {
                     hcfrest.edit(hc);
                 }
                 
+                SessionUtil sessionUtil = new SessionUtil();
+                if(!sessionUtil.setSession(getKID(request))){
+                    return false;
+                }
+                
                 return true;
             }
         } catch (Exception e) {

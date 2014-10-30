@@ -7,6 +7,7 @@
     <class>com.hobba.hobaserver.resources.HobaKeys</class>
     <class>com.hobba.hobaserver.resources.HobaChallenges</class>
     <class>com.hobba.hobaserver.resources.HobaToken</class>
+    <class>com.hobba.hobaserver.resources.HobaSession</class>
     <exclude-unlisted-classes>false</exclude-unlisted-classes>
     <properties>
       <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://127.0.0.1:5432/hoba"/>

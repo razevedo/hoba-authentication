@@ -13,6 +13,7 @@ import com.hobba.hobaserver.resources.HobaUser;
 import com.hobba.hobaserver.resources.ResponseObject;
 import com.hobba.hobaserver.services.security.ChallengeUtil;
 import com.hobba.hobaserver.services.security.RegisterUtil;
+import com.hobba.hobaserver.services.security.SessionUtil;
 import com.hobba.hobaserver.services.security.TokenUtil;
 import com.hobba.hobaserver.services.service.HobaKeysFacadeREST;
 import com.hobba.hobaserver.services.service.HobaUserFacadeREST;
@@ -38,7 +39,7 @@ import javax.ws.rs.core.Response;
 /**
  * REST Web Service
  *
- * @author Fabio GonÃ§alves
+ * @author Fabio GonÃƒÂ§alves
  */
 @Path("/")
 public class HobaResource {
@@ -90,6 +91,7 @@ public class HobaResource {
     @POST
     @Produces(MediaType.TEXT_PLAIN)
     public Response getChalenge(@FormParam("kid") String kid) {
+        em.getEntityManagerFactory().getCache().evictAll();
         ChallengeUtil challengeUtil = new ChallengeUtil();
         long expirationTime = 10;
         String challenge = challengeUtil.getChallenge(kid, 10);
@@ -97,11 +99,37 @@ public class HobaResource {
 
     }
     
+    @Path("logout")
+    @POST
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response logout(@FormParam("kid") String kid) {
+        em.getEntityManagerFactory().getCache().evictAll();
+        SessionUtil sessionUtil = new SessionUtil();
+        
+        if(!sessionUtil.isSessionValid(kid)){
+            return Response.status(Response.Status.FORBIDDEN).header("Authenticate", "HOBA").build();
+        }
+        
+        if(!sessionUtil.invalidateSession(kid)){
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }else{
+            return Response.status(Response.Status.OK).build();
+        }
+
+    }
+    
     @Path("key")
     @DELETE
     @Produces(MediaType.TEXT_PLAIN)
     public Response deleteKey(@FormParam("kid") String kid) {
-        
+        em.getEntityManagerFactory().getCache().evictAll();
+        System.out.println("kid del: "+kid);
+        SessionUtil sessionUtil = new SessionUtil();
+        if(!sessionUtil.isSessionValid(kid)){
+            System.out.println("here");
+            return Response.status(Response.Status.FORBIDDEN).header("Authenticate", "HOBA").build();
+        }
+        System.out.println("here2");
         HobaKeysFacadeREST hkfrest = new HobaKeysFacadeREST();
         HobaDevices hd = hkfrest.findHKIDbyKID(kid).getIdDevices();
         
@@ -116,6 +144,11 @@ public class HobaResource {
     @DELETE
     @Produces(MediaType.TEXT_PLAIN)
     public Response deleteAll(@FormParam("kid") String kid) {
+        em.getEntityManagerFactory().getCache().evictAll();
+        SessionUtil sessionUtil = new SessionUtil();
+        if(!sessionUtil.isSessionValid(kid)){
+            return Response.status(Response.Status.FORBIDDEN).header("Authenticate", "HOBA").build();
+        }
         
         HobaKeysFacadeREST hkfrest = new HobaKeysFacadeREST();
         HobaUser hu = hkfrest.findHKIDbyKID(kid).getIdDevices().getIduser();
@@ -134,6 +167,9 @@ public class HobaResource {
         ChallengeUtil challengeUtil = new ChallengeUtil();
         em.getEntityManagerFactory().getCache().evictAll();
         if (challengeUtil.isChallengeValid(request)) {
+            
+            SessionUtil sessionUtil = new SessionUtil();
+            
             return Response.status(Response.Status.OK).build();
         }
         return Response.status(Response.Status.UNAUTHORIZED).build();
@@ -144,6 +180,12 @@ public class HobaResource {
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public Response getToken(@QueryParam("kid") String kid, @QueryParam("expiration_time") String expiration_time) {
+        
+        SessionUtil sessionUtil = new SessionUtil();
+        if(!sessionUtil.isSessionValid(kid)){
+            return Response.status(Response.Status.FORBIDDEN).header("Authenticate", "HOBA").build();
+        }
+        
         em.getEntityManagerFactory().getCache().evictAll();
         TokenUtil tokenUtil = new TokenUtil();
 
@@ -155,6 +197,8 @@ public class HobaResource {
     @POST
     @Produces(MediaType.TEXT_PLAIN)
     public Response authToken(@FormParam("token") String token, @FormParam("kid") String kid) {
+        
+        
 
         em.getEntityManagerFactory().getCache().evictAll();
 
@@ -171,7 +215,13 @@ public class HobaResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getUAS(@QueryParam("kid") String kid) {
         em.getEntityManagerFactory().getCache().evictAll();
-
+        
+        
+        SessionUtil sessionUtil = new SessionUtil();
+        if(!sessionUtil.isSessionValid(kid)){
+            return Response.status(Response.Status.FORBIDDEN).header("Authenticate", "HOBA").build();
+        }
+        
         HobaKeysFacadeREST hkfrest = new HobaKeysFacadeREST();
         HobaKeys hk = hkfrest.findHKIDbyKID(kid);
         HobaUser hu = hk.getIdDevices().getIduser();
@@ -194,6 +244,11 @@ public class HobaResource {
     public Response getUserData(@QueryParam("kid") String kid) {
         em.getEntityManagerFactory().getCache().evictAll();
 
+        SessionUtil sessionUtil = new SessionUtil();
+        if(!sessionUtil.isSessionValid(kid)){
+            return Response.status(Response.Status.FORBIDDEN).header("Authenticate", "HOBA").build();
+        }
+        
         HobaKeysFacadeREST hkfrest = new HobaKeysFacadeREST();
         HobaKeys hk = hkfrest.findHKIDbyKID(kid);
 
@@ -215,6 +270,11 @@ public class HobaResource {
             @FormParam("field2") String field2,
             @FormParam("field3") String field3) {
         em.getEntityManagerFactory().getCache().evictAll();
+        
+        SessionUtil sessionUtil = new SessionUtil();
+        if(!sessionUtil.isSessionValid(kid)){
+            return Response.status(Response.Status.FORBIDDEN).header("Authenticate", "HOBA").build();
+        }
 
         HobaKeysFacadeREST hkfrest = new HobaKeysFacadeREST();
         HobaKeys hk = hkfrest.findHKIDbyKID(kid);

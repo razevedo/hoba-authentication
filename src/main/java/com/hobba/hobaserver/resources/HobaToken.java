@@ -8,7 +8,6 @@ package com.hobba.hobaserver.resources;
 import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -18,12 +17,12 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
+import org.eclipse.persistence.annotations.CascadeOnDelete;
 
 /**
  *
@@ -35,9 +34,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 @NamedQueries({
     @NamedQuery(name = "HobaToken.findAll", query = "SELECT h FROM HobaToken h"),
     @NamedQuery(name = "HobaToken.findByIdToken", query = "SELECT h FROM HobaToken h WHERE h.idToken = :idToken"),
-    @NamedQuery(name = "HobaToken.findByToken", query = "SELECT h FROM HobaToken h WHERE h.token = :token"),
     @NamedQuery(name = "HobaToken.findByExpiration", query = "SELECT h FROM HobaToken h WHERE h.expiration = :expiration"),
-    @NamedQuery(name = "HobaToken.findByIsValid", query = "SELECT h FROM HobaToken h WHERE h.isValid = :isValid")})
+    @NamedQuery(name = "HobaToken.findByIsValid", query = "SELECT h FROM HobaToken h WHERE h.isValid = :isValid"),
+    @NamedQuery(name = "HobaToken.findByToken", query = "SELECT h FROM HobaToken h WHERE h.token = :token")})
 public class HobaToken implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
@@ -54,9 +53,9 @@ public class HobaToken implements Serializable {
     @Column(name = "token")
     private String token;
     @JoinColumn(name = "id_user", referencedColumnName = "id_user")
-    @ManyToOne(optional = false)
+    @ManyToOne
+    @CascadeOnDelete
     private HobaUser idUser;
-    
 
     public HobaToken() {
     }
@@ -73,14 +72,6 @@ public class HobaToken implements Serializable {
         this.idToken = idToken;
     }
 
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
-
     public Date getExpiration() {
         return expiration;
     }
@@ -95,6 +86,14 @@ public class HobaToken implements Serializable {
 
     public void setIsValid(Boolean isValid) {
         this.isValid = isValid;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 
     public HobaUser getIdUser() {
@@ -127,7 +126,7 @@ public class HobaToken implements Serializable {
 
     @Override
     public String toString() {
-        return "com.hobba.hobaserver.services.HobaToken[ idToken=" + idToken + " ]";
+        return "com.hobba.hobaserver.resources.HobaToken[ idToken=" + idToken + " ]";
     }
     
 }

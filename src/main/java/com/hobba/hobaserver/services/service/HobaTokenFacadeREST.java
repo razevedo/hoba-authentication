@@ -25,7 +25,7 @@ import javax.ws.rs.Produces;
  * @author Fabio Gonçalves
  */
 @Stateless
-@Path("com.hobba.hobaserver.services.hobatoken")
+@Path("com.hobba.hobaserver.resources.hobatoken")
 public class HobaTokenFacadeREST extends AbstractFacade<HobaToken> {
     @PersistenceContext(unitName = "com.hobba_HOBAServer_war_1.0-SNAPSHOTPU")
     private EntityManager em;

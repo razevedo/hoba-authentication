@@ -8,10 +8,8 @@ package com.hobba.hobaserver.resources;
 import java.io.Serializable;
 import java.util.Collection;
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -26,7 +24,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.eclipse.persistence.annotations.CascadeOnDelete;
-import org.eclipse.persistence.annotations.PrivateOwned;
 
 /**
  *
@@ -38,8 +35,8 @@ import org.eclipse.persistence.annotations.PrivateOwned;
 @NamedQueries({
     @NamedQuery(name = "HobaKeys.findAll", query = "SELECT h FROM HobaKeys h"),
     @NamedQuery(name = "HobaKeys.findByIdKeys", query = "SELECT h FROM HobaKeys h WHERE h.idKeys = :idKeys"),
-    @NamedQuery(name = "HobaKeys.findByKidtype", query = "SELECT h FROM HobaKeys h WHERE h.kidtype = :kidtype"),
     @NamedQuery(name = "HobaKeys.findByKid", query = "SELECT h FROM HobaKeys h WHERE h.kid = :kid"),
+    @NamedQuery(name = "HobaKeys.findByKidtype", query = "SELECT h FROM HobaKeys h WHERE h.kidtype = :kidtype"),
     @NamedQuery(name = "HobaKeys.findByPub", query = "SELECT h FROM HobaKeys h WHERE h.pub = :pub")})
 public class HobaKeys implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -55,12 +52,12 @@ public class HobaKeys implements Serializable {
     @Column(name = "kidtype")
     private String kidtype;
     @Size(max = 500)
-    @Column(name = "pub", length = 500)
+    @Column(name = "pub")
     private String pub;
     @JoinColumn(name = "id_devices", referencedColumnName = "id_devices")
-    @ManyToOne(optional = false)
+    @ManyToOne
     private HobaDevices idDevices;
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval=true, mappedBy = "idKeys")
+    @OneToMany(mappedBy = "idKeys")
     @CascadeOnDelete
     private Collection<HobaChallenges> hobaChallengesCollection;
 
@@ -79,20 +76,20 @@ public class HobaKeys implements Serializable {
         this.idKeys = idKeys;
     }
 
-    public String getKidtype() {
-        return kidtype;
-    }
-
-    public void setKidtype(String kidtype) {
-        this.kidtype = kidtype;
-    }
-
     public String getKid() {
         return kid;
     }
 
     public void setKid(String kid) {
         this.kid = kid;
+    }
+
+    public String getKidtype() {
+        return kidtype;
+    }
+
+    public void setKidtype(String kidtype) {
+        this.kidtype = kidtype;
     }
 
     public String getPub() {
@@ -103,14 +100,22 @@ public class HobaKeys implements Serializable {
         this.pub = pub;
     }
 
-   
-
     public HobaDevices getIdDevices() {
         return idDevices;
     }
 
     public void setIdDevices(HobaDevices idDevices) {
         this.idDevices = idDevices;
+    }
+
+    @XmlTransient
+    @JsonIgnore
+    public Collection<HobaChallenges> getHobaChallengesCollection() {
+        return hobaChallengesCollection;
+    }
+
+    public void setHobaChallengesCollection(Collection<HobaChallenges> hobaChallengesCollection) {
+        this.hobaChallengesCollection = hobaChallengesCollection;
     }
 
     @Override
@@ -135,17 +140,7 @@ public class HobaKeys implements Serializable {
 
     @Override
     public String toString() {
-        return "com.hobba.hobaserver.services.HobaKeys[ idKeys=" + idKeys + " ]";
-    }
-
-    @XmlTransient
-    @JsonIgnore
-    public Collection<HobaChallenges> getHobaChallengesCollection() {
-        return hobaChallengesCollection;
-    }
-
-    public void setHobaChallengesCollection(Collection<HobaChallenges> hobaChallengesCollection) {
-        this.hobaChallengesCollection = hobaChallengesCollection;
+        return "com.hobba.hobaserver.resources.HobaKeys[ idKeys=" + idKeys + " ]";
     }
     
 }

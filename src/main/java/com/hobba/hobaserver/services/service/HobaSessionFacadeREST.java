@@ -6,7 +6,7 @@
 package com.hobba.hobaserver.services.service;
 
 import com.hobba.hobaserver.entitymanager.EntityManagerListener;
-import com.hobba.hobaserver.resources.HobaChallenges;
+import com.hobba.hobaserver.resources.HobaSession;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -25,26 +25,26 @@ import javax.ws.rs.Produces;
  * @author Fabio Gonçalves
  */
 @Stateless
-@Path("com.hobba.hobaserver.resources.hobachallenges")
-public class HobaChallengesFacadeREST extends AbstractFacade<HobaChallenges> {
+@Path("com.hobba.hobaserver.resources.hobasession")
+public class HobaSessionFacadeREST extends AbstractFacade<HobaSession> {
     @PersistenceContext(unitName = "com.hobba_HOBAServer_war_1.0-SNAPSHOTPU")
     private EntityManager em;
 
-    public HobaChallengesFacadeREST() {
-        super(HobaChallenges.class);
+    public HobaSessionFacadeREST() {
+        super(HobaSession.class);
     }
 
     @POST
     @Override
     @Consumes({"application/xml", "application/json"})
-    public HobaChallenges create(HobaChallenges entity) {
+    public HobaSession create(HobaSession entity) {
         return super.create(entity);
     }
 
     @PUT
     @Path("{id}")
     @Consumes({"application/xml", "application/json"})
-    public void edit(@PathParam("id") Integer id, HobaChallenges entity) {
+    public void edit(@PathParam("id") Integer id, HobaSession entity) {
         super.edit(entity);
     }
 
@@ -57,21 +57,21 @@ public class HobaChallengesFacadeREST extends AbstractFacade<HobaChallenges> {
     @GET
     @Path("{id}")
     @Produces({"application/xml", "application/json"})
-    public HobaChallenges find(@PathParam("id") Integer id) {
+    public HobaSession find(@PathParam("id") Integer id) {
         return super.find(id);
     }
 
     @GET
     @Override
     @Produces({"application/xml", "application/json"})
-    public List<HobaChallenges> findAll() {
+    public List<HobaSession> findAll() {
         return super.findAll();
     }
 
     @GET
     @Path("{from}/{to}")
     @Produces({"application/xml", "application/json"})
-    public List<HobaChallenges> findRange(@PathParam("from") Integer from, @PathParam("to") Integer to) {
+    public List<HobaSession> findRange(@PathParam("from") Integer from, @PathParam("to") Integer to) {
         return super.findRange(new int[]{from, to});
     }
 

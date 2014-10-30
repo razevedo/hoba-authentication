@@ -168,7 +168,7 @@ and open the template in the editor.
         <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.9.0/jquery-ui.min.js"></script>
         <script src="assets/metro/js/metro.min.js" type="text/javascript"></script>
         <script language="JavaScript" type="text/javascript" src="js/jsrsasign-4.7.0-all-min.js"></script>
-        
+
         <script type="text/javascript" src="js/fingerprint.js"></script>
 
 
@@ -188,7 +188,8 @@ and open the template in the editor.
                                                     tokenURL: serverURL + "token",
                                                     keyURL: serverURL + "key",
                                                     challengeURL: serverURL + "getchal",
-                                                    authURL: serverURL + "auth"
+                                                    authURL: serverURL + "auth",
+                                                    logoutURL: serverURL + "logout"
                                                 }
 
 
@@ -240,7 +241,8 @@ and open the template in the editor.
                                                     var qrcode = new QRCode("qrcodediv");
                                                     qrcode.clear();
                                                     var response = hoba.getToken(expirationTime);
-                                                    if (response != -1) {
+                                                    var cont = handleResponse(response, "Error getting qrcode", "");
+                                                    if (cont) {
                                                         var code = response;
                                                         qrcode.makeCode(code);
                                                     }
@@ -268,8 +270,9 @@ and open the template in the editor.
                                                     $("#reponsediv").show();
                                                     var expirationTime = $("#expirationTime").val();
                                                     var response = hoba.getToken(expirationTime);
-
-                                                    if (response != -1) {
+                                                    console.log(response);
+                                                    var cont = handleResponse(response, "Error getting token", "");
+                                                    if (cont) {
                                                         $("#reponsediv").html(response);
                                                     }
                                                 }
@@ -279,6 +282,7 @@ and open the template in the editor.
                                                 function userRegister() {
                                                     var response;
                                                     response = hoba.registration();
+
                                                     if (response === 0) {
                                                         manageButtons(false, true);
                                                     }
@@ -287,44 +291,40 @@ and open the template in the editor.
                                                 function userLogin() {
                                                     var response;
                                                     response = hoba.login();
-                                                    if (response === 0) {
+                                                    var cont = handleResponse(response, "Error logging in", "Logged in successfuly");
+                                                    if (cont) {
                                                         manageButtons(true, true);
-                                                        setOperationResultMessage("Successful Login", false);
-                                                        showWelcomeMesage();
-                                                    } else {
-                                                        setOperationResultMessage("Error logging in", true);
                                                     }
                                                 }
 
                                                 function logout() {
-                                                    hoba.logout();
+                                                    var response = hoba.logout();
+                                                    var cont = handleResponse(response, "Error logging out", "");
                                                     manageButtons(false, true);
-                                                    
+
+
                                                 }
                                                 function unregister() {
                                                     var del = confirm("Are you sure you want to unregister this device?");
                                                     if (del) {
                                                         manageButtons(false, false);
                                                         var response = hoba.unregister();
-                                                        if (response === 0) {
-                                                            setOperationResultMessage("Device Unregistered", false);
-                                                        } else {
-                                                            setOperationResultMessage("Error Unregistering device", true);
+                                                        var cont = handleResponse(response, "Error getting connections", "");
+                                                        if (cont) {
+                                                            manageButtons(false, false);
                                                         }
                                                     }
                                                 }
+
                                                 function zapData() {
                                                     var del = confirm("Are you sure you want zap the user data?");
                                                     if (del) {
                                                         var response = hoba.zapData();
-                                                        if (response === 0) {
-                                                            setOperationResultMessage("User data zapped", false);
-                                                            logout();
-
-
+                                                        var cont = handleResponse(response, "Error zapping user data", "User data deleted");
+                                                        if (cont) {
                                                             manageButtons(false, false);
-                                                        } else {
-                                                            setOperationResultMessage("Error zapping data", true);
+                                                        }else{
+                                                            manageButtons(false, true);
                                                         }
                                                     }
                                                 }
@@ -332,9 +332,11 @@ and open the template in the editor.
                                                 function getUserData() {
                                                     cleanDivs();
                                                     $("#userdata").show();
-
                                                     var data = hoba.getUserData();
-                                                    console.log(data);
+                                                    var cont = handleResponse(data, "Error getting user data", "");
+                                                    if (!cont)
+                                                        return;
+
                                                     if (data.field1 != null) {
                                                         $("#field1").val(data.field1);
                                                     }
@@ -346,11 +348,13 @@ and open the template in the editor.
                                                     }
                                                 }
 
+
                                                 function getUAS() {
                                                     cleanDivs();
                                                     var data = hoba.getConnections();
+                                                    var cont = handleResponse(data, "Error getting connections", "");
 
-                                                    if (data != -1) {
+                                                    if (cont) {
                                                         var responseDiv = $("#reponsediv");
                                                         var table = "<table class='table striped' id='connectionsTable'>"
                                                         table = table + "<thead><td>Device Type</td><td>Ip Address</td><td>Date</td><td>Key ID</td><td>Delete</td></thead>";
@@ -389,13 +393,8 @@ and open the template in the editor.
                                                     var del = confirm("Do you want to delete the device with kid: " + kidRemove);
                                                     if (del) {
                                                         var response = hoba.removeKid(kidRemove.toString());
+                                                        handleResponse(resp, "Error removing key", "Key removed succesfuly");
 
-                                                        if (response == 0) {
-                                                            setOperationResultMessage("KID removed", false);
-                                                            getUAS();
-                                                        } else {
-                                                            setOperationResultMessage("Erro Removing KID", true);
-                                                        }
                                                     }
 
                                                 }
@@ -406,10 +405,23 @@ and open the template in the editor.
                                                     var field3 = $("#field3").val();
 
                                                     var resp = hoba.setUserData(field1, field2, field3);
-                                                    if (resp === 0) {
-                                                        setOperationResultMessage("User data added successfuly", false);
+                                                    handleResponse(resp, "Error setting user data", "User data added successfuly");
+                                                }
+
+                                                function handleResponse(response, messageOnError, messageOnSuccess) {
+
+                                                    if (response < 0) {
+                                                        if (response == -1) {
+                                                            setOperationResultMessage("Session Expired", true);
+                                                            manageButtons(false, true);
+                                                            hoba.logout();
+                                                        } else {
+                                                            setOperationResultMessage(messageOnError, true);
+                                                        }
+                                                        return false;
                                                     } else {
-                                                        setOperationResultMessage("Error adding user data", true);
+                                                        setOperationResultMessage(messageOnSuccess, false);
+                                                        return true;
                                                     }
                                                 }
 
@@ -424,7 +436,8 @@ and open the template in the editor.
                                                         $("#userdata").hide();
                                                         $("#userbutton").show();
                                                         $("#reponsediv").show();
-
+                                                        $("#unregister").show();
+                                                        $("#zapdata").show();
                                                     }
                                                     else {
                                                         $("#logout").hide();
@@ -436,12 +449,13 @@ and open the template in the editor.
                                                         $("#userbutton").hide();
                                                         $("#reponsediv").hide();
                                                         $("#welcomeMessage").hide();
-
+                                                        $("#unregister").hide();
+                                                        $("#zapdata").hide();
                                                     }
 
                                                     if (registed) {
-                                                        $("#unregister").show();
-                                                        $("#zapdata").show();
+
+
                                                         if (!login) {
                                                             $("#login").show();
                                                         }

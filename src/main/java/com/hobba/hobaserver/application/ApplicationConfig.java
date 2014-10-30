@@ -42,6 +42,7 @@ public class ApplicationConfig extends Application {
         resources.add(com.hobba.hobaserver.services.service.HobaDevicesFacadeREST.class);
         resources.add(com.hobba.hobaserver.services.service.HobaKeysFacadeREST.class);
         resources.add(com.hobba.hobaserver.services.service.HobaResource.class);
+        resources.add(com.hobba.hobaserver.services.service.HobaSessionFacadeREST.class);
         resources.add(com.hobba.hobaserver.services.service.HobaTokenFacadeREST.class);
         resources.add(com.hobba.hobaserver.services.service.HobaUserFacadeREST.class);
     }

@@ -25,7 +25,7 @@ import javax.ws.rs.Produces;
  * @author Fabio Gonçalves
  */
 @Stateless
-@Path("com.hobba.hobaserver.services.hobauser")
+@Path("com.hobba.hobaserver.resources.hobauser")
 public class HobaUserFacadeREST extends AbstractFacade<HobaUser> {
     @PersistenceContext(unitName = "com.hobba_HOBAServer_war_1.0-SNAPSHOTPU")
     private EntityManager em;

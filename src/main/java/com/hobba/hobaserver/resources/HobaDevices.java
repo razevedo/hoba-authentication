@@ -9,10 +9,8 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -25,31 +23,25 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.Size;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.eclipse.persistence.annotations.CascadeOnDelete;
-import org.eclipse.persistence.annotations.PrivateOwned;
 
 /**
  *
  * @author Fabio Gonçalves
  */
 @Entity
-@XmlAccessorType(XmlAccessType.PUBLIC_MEMBER)
-@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @Table(name = "hoba_devices")
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "HobaDevices.findAll", query = "SELECT h FROM HobaDevices h"),
     @NamedQuery(name = "HobaDevices.findByIdDevices", query = "SELECT h FROM HobaDevices h WHERE h.idDevices = :idDevices"),
     @NamedQuery(name = "HobaDevices.findByDid", query = "SELECT h FROM HobaDevices h WHERE h.did = :did"),
+    @NamedQuery(name = "HobaDevices.findByDidtype", query = "SELECT h FROM HobaDevices h WHERE h.didtype = :didtype"),
     @NamedQuery(name = "HobaDevices.findByIpAddress", query = "SELECT h FROM HobaDevices h WHERE h.ipAddress = :ipAddress"),
-    @NamedQuery(name = "HobaDevices.findByLastDate", query = "SELECT h FROM HobaDevices h WHERE h.lastDate = :lastDate"),
-    @NamedQuery(name = "HobaDevices.findByDidtype", query = "SELECT h FROM HobaDevices h WHERE h.didtype = :didtype")})
+    @NamedQuery(name = "HobaDevices.findByLastDate", query = "SELECT h FROM HobaDevices h WHERE h.lastDate = :lastDate")})
 public class HobaDevices implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
@@ -70,11 +62,14 @@ public class HobaDevices implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date lastDate;
     @JoinColumn(name = "iduser", referencedColumnName = "id_user")
-    @ManyToOne(optional = false)
+    @ManyToOne
     private HobaUser iduser;
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval=true, mappedBy = "idDevices")
+    @OneToMany(mappedBy = "idDevices")
     @CascadeOnDelete
     private Collection<HobaKeys> hobaKeysCollection;
+    @OneToMany(mappedBy = "idDevices")
+    @CascadeOnDelete
+    private Collection<HobaSession> hobaSessionCollection;
 
     public HobaDevices() {
     }
@@ -99,6 +94,14 @@ public class HobaDevices implements Serializable {
         this.did = did;
     }
 
+    public String getDidtype() {
+        return didtype;
+    }
+
+    public void setDidtype(String didtype) {
+        this.didtype = didtype;
+    }
+
     public String getIpAddress() {
         return ipAddress;
     }
@@ -113,14 +116,6 @@ public class HobaDevices implements Serializable {
 
     public void setLastDate(Date lastDate) {
         this.lastDate = lastDate;
-    }
-
-    public String getDidtype() {
-        return didtype;
-    }
-
-    public void setDidtype(String didtype) {
-        this.didtype = didtype;
     }
 
     public HobaUser getIduser() {
@@ -139,6 +134,16 @@ public class HobaDevices implements Serializable {
 
     public void setHobaKeysCollection(Collection<HobaKeys> hobaKeysCollection) {
         this.hobaKeysCollection = hobaKeysCollection;
+    }
+
+    @XmlTransient
+    @JsonIgnore
+    public Collection<HobaSession> getHobaSessionCollection() {
+        return hobaSessionCollection;
+    }
+
+    public void setHobaSessionCollection(Collection<HobaSession> hobaSessionCollection) {
+        this.hobaSessionCollection = hobaSessionCollection;
     }
 
     @Override
@@ -163,7 +168,7 @@ public class HobaDevices implements Serializable {
 
     @Override
     public String toString() {
-        return "com.hobba.hobaserver.services.HobaDevices[ idDevices=" + idDevices + " ]";
+        return "com.hobba.hobaserver.resources.HobaDevices[ idDevices=" + idDevices + " ]";
     }
     
 }

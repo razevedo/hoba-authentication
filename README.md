@@ -254,12 +254,12 @@ In the following code block is a simple hoba client in html with javascript. Thi
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
         <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.9.0/jquery-ui.min.js"></script>
         <script language="JavaScript" type="text/javascript" src="js/jsrsasign-4.7.0-all-min.js"></script>
-        
+
         <script type="text/javascript" src="js/fingerprint.js"></script>
 
 
         <script type="text/javascript" src="js/qrcode.min.js"></script>
-        <script type="text/javascript" src="js/hoba_auth.js"></script>
+        <script type="text/javascript" src="js/hoba_auth-min.js"></script>
     </head>
     <body>
         <h1>hoba-authentication sample</h1>
@@ -283,40 +283,40 @@ In the following code block is a simple hoba client in html with javascript. Thi
                 challengeURL: serverURL + "getchal",
                 authURL: serverURL + "auth"
             }
-            
-            $(document).ready(function (){
+
+            $(document).ready(function () {
                 hoba.Init(initObj);
             });
-            function register(){
-                if(hoba.registration() == 0){
+            function register() {
+                if (hoba.registration() == 0) {
                     $('#response').text("Registration successfull");
-                }else{
+                } else {
                     $('#response').text("Error in registration");
                 }
             }
-            function login(){
-                if(hoba.login() == 0){
+            function login() {
+                if (hoba.login() == 0) {
                     $('#response').text("Login Successfull");
-                }else{
+                } else {
                     $('#response').text("Error logging in");
                 }
             }
-            function logout(){
+            function logout() {
                 $('#response').text("Logout");
                 hoba.logout();
-                
+
             }
-            function unregister(){
-                if(hoba.unregister() == 0){
+            function unregister() {
+                if (hoba.unregister() == 0) {
                     $('#response').text("Unregister successfull");
-                }else{
+                } else {
                     $('#response').text("Error unregistering");
                 }
             }
-            function  zapData(){
-                if(hoba.zapData() == 0){
+            function  zapData() {
+                if (hoba.zapData() == 0) {
                     $('#response').text("Zaping data successfull");
-                }else{
+                } else {
                     $('#response').text("Error zapping data");
                 }
             }

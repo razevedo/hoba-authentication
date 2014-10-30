@@ -107,7 +107,7 @@ public class HobaResource {
         SessionUtil sessionUtil = new SessionUtil();
         
         if(!sessionUtil.isSessionValid(kid)){
-            return Response.status(Response.Status.FORBIDDEN).header("Authenticate", "HOBA").build();
+            return Response.status(Response.Status.UNAUTHORIZED).header("Authenticate", "HOBA").build();
         }
         
         if(!sessionUtil.invalidateSession(kid)){
@@ -123,13 +123,10 @@ public class HobaResource {
     @Produces(MediaType.TEXT_PLAIN)
     public Response deleteKey(@FormParam("kid") String kid) {
         em.getEntityManagerFactory().getCache().evictAll();
-        System.out.println("kid del: "+kid);
         SessionUtil sessionUtil = new SessionUtil();
         if(!sessionUtil.isSessionValid(kid)){
-            System.out.println("here");
-            return Response.status(Response.Status.FORBIDDEN).header("Authenticate", "HOBA").build();
+            return Response.status(Response.Status.UNAUTHORIZED).header("Authenticate", "HOBA").build();
         }
-        System.out.println("here2");
         HobaKeysFacadeREST hkfrest = new HobaKeysFacadeREST();
         HobaDevices hd = hkfrest.findHKIDbyKID(kid).getIdDevices();
         
@@ -147,7 +144,7 @@ public class HobaResource {
         em.getEntityManagerFactory().getCache().evictAll();
         SessionUtil sessionUtil = new SessionUtil();
         if(!sessionUtil.isSessionValid(kid)){
-            return Response.status(Response.Status.FORBIDDEN).header("Authenticate", "HOBA").build();
+            return Response.status(Response.Status.UNAUTHORIZED).header("Authenticate", "HOBA").build();
         }
         
         HobaKeysFacadeREST hkfrest = new HobaKeysFacadeREST();
@@ -183,7 +180,7 @@ public class HobaResource {
         
         SessionUtil sessionUtil = new SessionUtil();
         if(!sessionUtil.isSessionValid(kid)){
-            return Response.status(Response.Status.FORBIDDEN).header("Authenticate", "HOBA").build();
+            return Response.status(Response.Status.UNAUTHORIZED).header("Authenticate", "HOBA").build();
         }
         
         em.getEntityManagerFactory().getCache().evictAll();
@@ -219,7 +216,7 @@ public class HobaResource {
         
         SessionUtil sessionUtil = new SessionUtil();
         if(!sessionUtil.isSessionValid(kid)){
-            return Response.status(Response.Status.FORBIDDEN).header("Authenticate", "HOBA").build();
+            return Response.status(Response.Status.UNAUTHORIZED).header("Authenticate", "HOBA").build();
         }
         
         HobaKeysFacadeREST hkfrest = new HobaKeysFacadeREST();
@@ -246,7 +243,7 @@ public class HobaResource {
 
         SessionUtil sessionUtil = new SessionUtil();
         if(!sessionUtil.isSessionValid(kid)){
-            return Response.status(Response.Status.FORBIDDEN).header("Authenticate", "HOBA").build();
+            return Response.status(Response.Status.UNAUTHORIZED).header("Authenticate", "HOBA").build();
         }
         
         HobaKeysFacadeREST hkfrest = new HobaKeysFacadeREST();
@@ -273,7 +270,7 @@ public class HobaResource {
         
         SessionUtil sessionUtil = new SessionUtil();
         if(!sessionUtil.isSessionValid(kid)){
-            return Response.status(Response.Status.FORBIDDEN).header("Authenticate", "HOBA").build();
+            return Response.status(Response.Status.UNAUTHORIZED).header("Authenticate", "HOBA").build();
         }
 
         HobaKeysFacadeREST hkfrest = new HobaKeysFacadeREST();

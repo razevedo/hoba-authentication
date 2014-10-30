@@ -70,7 +70,6 @@ public class SessionUtil {
     }
     
     public boolean invalidateSession(String kid){
-        System.out.println("kid sess: "+kid);
         try {
             HobaSessionFacadeREST hsfrest = new HobaSessionFacadeREST();
 

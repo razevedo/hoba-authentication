@@ -134,7 +134,6 @@ public class ChallengeUtil {
         String origin = request.getRequestURL().toString();
         origin = origin.split("/")[0] + "//" + origin.split("/")[2] + "/";
         String hobaTbs = nonce + " " + alg + " " + origin + " " + kid + " " + chalenge;
-        System.out.println("hoba: "+hobaTbs);
         return hobaTbs;
     }
 

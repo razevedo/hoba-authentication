@@ -157,7 +157,20 @@ Returns the several several UAs where the same user as been connected
 
 List containing all the connections: ["deviceType": "", "ipAddress": "", "date": "", "kid": ""]
 
+POST hoba/logout
+------------------
+Verifies the token validity and binds the UA
 
+**Parameters**
+
+* *kid*: Public Key ID
+
+**Returns**
+
+*HTTP Response Status*
+
+* On Success: 200
+* On Failure: 400
 
 Usage
 ===================
@@ -174,7 +187,8 @@ To use the hoba_auth-min.js you need to start by initializing the object with th
     tokenURL: serverURL + "token",
     keyURL: serverURL + "key",
     challengeURL: serverURL + "getchal",
-    authURL: serverURL + "auth"
+    authURL: serverURL + "auth",
+    logoutURL: serverURL + "logout"
   }
 
   hoba.Init(initObj);

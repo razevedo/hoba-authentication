@@ -25,7 +25,19 @@ How it works
 ===================
 This project uses a client with javascript and a server with a rest api. The hoba_authentication.js methods are described int the Usage section. The rest api is as follows:
 
-POST hoba/register
+
+GET .well-known/hoba/
+------------------
+Gets all the endpoints information
+
+**Parameters**
+
+**Returns**
+
+* returns a JSON list with all the endpoints information.
+
+
+POST .well-known/hoba/register
 ------------------
 Registers an UA in the hoba database.
 
@@ -43,7 +55,7 @@ Registers an UA in the hoba database.
 
 * Hobareg-val
 
-POST hoba/getchal
+POST .well-known/hoba/getchal
 ------------------
 Allows the UA to get a challenge to be used for authentication
 
@@ -58,7 +70,7 @@ Allows the UA to get a challenge to be used for authentication
 * challenge = [generated_challenge]
 * max-age = [expiration_time]
 
-POST hoba/auth
+POST .well-known/hoba/auth
 ------------------
 Authenticates an UA
 
@@ -73,7 +85,7 @@ Authenticates an UA
 * On success: 200
 * On Failure: 400
 
-DELETE hoba/key
+DELETE .well-known/hoba/key
 ------------------
 Deltes an UA key ensuring UA unregistration
 
@@ -88,7 +100,7 @@ Deltes an UA key ensuring UA unregistration
 * On success: 200
 * On Failure: 500
 
-DELETE hoba/user
+DELETE .well-known/hoba/user
 ------------------
 Deltes all the user data
 
@@ -104,7 +116,7 @@ Deltes all the user data
 * On success: 200
 * On Failure: 500
 
-GET hoba/user
+GET .well-known/hoba/user
 ------------------
 Gets the user data
 
@@ -117,7 +129,7 @@ Gets the user data
 List containing all the connections: {"idUser":1,"field1":"","field2":"","field3":""}
 
 
-GET hoba/token
+GET .well-known/hoba/token
 ------------------
 Gets a token that can be used for binding another UA
 
@@ -129,7 +141,7 @@ Gets a token that can be used for binding another UA
 
 *Token*
 
-POST hoba/token
+POST .well-known/hoba/token
 ------------------
 Verifies the token validity and binds the UA
 
@@ -145,7 +157,7 @@ Verifies the token validity and binds the UA
 * On success: 200
 * On Failure: 400
 
-POST hoba/uas
+POST .well-known/hoba/uas
 ------------------
 Returns the several several UAs where the same user as been connected
 
@@ -157,7 +169,7 @@ Returns the several several UAs where the same user as been connected
 
 List containing all the connections: ["deviceType": "", "ipAddress": "", "date": "", "kid": ""]
 
-POST hoba/logout
+POST .well-known/hoba/logout
 ------------------
 Verifies the token validity and binds the UA
 
@@ -178,7 +190,7 @@ Download the js libraries fingerprint.js, hoba_auth-min.js, jsrsasign-4.7.0-all-
 To use the hoba_auth-min.js you need to start by initializing the object with the server endpoints urls.
 
 ```html
-  var serverURL = "server_url:server_port/hoba-authentication/hoba/";
+  var serverURL = "server_url:server_port/hoba-authentication/.well-known/hoba/";
     var initObj = {
     protocol: "http://",
     registerURL: serverURL + "register",
@@ -285,7 +297,7 @@ In the following code block is a simple hoba client in html with javascript. Thi
         <div id="response"></div>
 
         <script type="text/javascript">
-            var serverURL = "localhost:8080/hoba-authentication/hoba/";
+            var serverURL = "localhost:8080/hoba-authentication/.well-known/hoba/";
 
             var initObj = {
                 protocol: "http://",

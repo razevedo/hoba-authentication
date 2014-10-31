@@ -28,7 +28,7 @@ This project uses a client with javascript and a server with a rest api. The hob
 
 GET .well-known/hoba/
 ------------------
-Gets all the endpoints information
+Gets all the information about the endpoints
 
 **Parameters**
 

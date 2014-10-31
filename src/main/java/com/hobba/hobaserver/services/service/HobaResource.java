@@ -8,6 +8,7 @@ package com.hobba.hobaserver.services.service;
 import com.hobba.hobaserver.entitymanager.EntityManagerListener;
 import com.hobba.hobaserver.resources.HobaConnections;
 import com.hobba.hobaserver.resources.HobaDevices;
+import com.hobba.hobaserver.resources.HobaEndpoints;
 import com.hobba.hobaserver.resources.HobaKeys;
 import com.hobba.hobaserver.resources.HobaUser;
 import com.hobba.hobaserver.resources.ResponseObject;
@@ -41,7 +42,7 @@ import javax.ws.rs.core.Response;
  *
  * @author Fabio GonÃƒÂ§alves
  */
-@Path("/")
+@Path("/hoba/")
 public class HobaResource {
 
     @Context
@@ -63,9 +64,68 @@ public class HobaResource {
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public String getJSON() {
+    public List getJSON() {
         //TODO return proper representation object
-        return "Hello World";
+        
+        List<HobaEndpoints> hobaEndpointses = new ArrayList<HobaEndpoints>();
+        HobaEndpoints endpoints;
+        
+        endpoints = new HobaEndpoints("register", ".well-known/hoba/register", "POST", "FormParametes","");
+        endpoints.addParameter("pub");
+        endpoints.addParameter("kidtype");
+        endpoints.addParameter("kid");
+        endpoints.addParameter("didtype");
+        endpoints.addParameter("did");
+        hobaEndpointses.add(endpoints);
+        
+        endpoints = new HobaEndpoints("getchal", ".well-known/hoba/getchal", "POST", "FormParametes","");
+        endpoints.addParameter("kid");
+        hobaEndpointses.add(endpoints);
+        
+        endpoints = new HobaEndpoints("authentication", ".well-known/hoba/auth", "POST", "HeaderParameters","Authorized");
+        endpoints.addParameter("HOBA-RES");
+        hobaEndpointses.add(endpoints);
+        
+        
+        endpoints = new HobaEndpoints("logout", ".well-known/hoba/logout", "POST", "FormParametes","");
+        endpoints.addParameter("kid");
+        hobaEndpointses.add(endpoints);
+        
+        endpoints = new HobaEndpoints("deleteKey", ".well-known/hoba/key", "DELETE", "FormParametes","");
+        endpoints.addParameter("kid");
+        hobaEndpointses.add(endpoints);
+        
+        endpoints = new HobaEndpoints("getAuthenticationToken", ".well-known/hoba/token", "GET", "QueryParametes","");
+        endpoints.addParameter("kid");
+        endpoints.addParameter("expiration_time");
+        hobaEndpointses.add(endpoints);
+        
+        endpoints = new HobaEndpoints("authenticateToken", ".well-known/hoba/token", "POST", "FormParametes","");
+        endpoints.addParameter("kid");
+        endpoints.addParameter("token");
+        hobaEndpointses.add(endpoints);
+        
+        endpoints = new HobaEndpoints("getUAs", ".well-known/hoba/uas", "GET", "QueryParametes","");
+        endpoints.addParameter("kid");
+        hobaEndpointses.add(endpoints);
+        
+        endpoints = new HobaEndpoints("getUserData", ".well-known/hoba/user", "GET", "QueryParametes","");
+        endpoints.addParameter("kid");
+        hobaEndpointses.add(endpoints);
+        
+        endpoints = new HobaEndpoints("setUserData", ".well-known/hoba/user", "POST", "FormParametes","");
+        endpoints.addParameter("kid");
+        endpoints.addParameter("field1");
+        endpoints.addParameter("field2");
+        endpoints.addParameter("field3");
+        hobaEndpointses.add(endpoints);
+        
+        endpoints = new HobaEndpoints("deleteUser", ".well-known/hoba/user", "DELETE", "FormParametes","");
+        endpoints.addParameter("kid");
+        hobaEndpointses.add(endpoints);
+        
+        
+        return hobaEndpointses;
     }
 
     @Path("register")

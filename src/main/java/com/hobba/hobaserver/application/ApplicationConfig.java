@@ -14,7 +14,7 @@ import javax.ws.rs.core.Application;
  *
  * @author Fabio Gonçalves
  */
-@javax.ws.rs.ApplicationPath("hoba")
+@javax.ws.rs.ApplicationPath(".well-known")
 public class ApplicationConfig extends Application {
 
     @Override

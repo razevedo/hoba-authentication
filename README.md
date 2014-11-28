@@ -370,7 +370,7 @@ Authors
 ===================
 _This implementation has been done within Portugal Telecom Inovação e Sistemas under technology and new concept experimentations_
 
-[Fábio Gonçalves] (fabio-r-goncalves@telecom.pt)
+Fábio Gonçalves (fabio-r-goncalves@telecom.pt)
 [Ricardo Azevedo](http://pt.linkedin.com/in/razevedoper/)
 
 License (MIT)

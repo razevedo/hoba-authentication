@@ -365,11 +365,13 @@ yes, there is another implementation [www.hoba.ie](https://hoba.ie/faq.html). We
 
 _for more questions and not to repeat what is already well described go here [www.hoba.ie/faq.html](https://hoba.ie/faq.html)_
 
-######Fábio Gonçalves & [Ricardo Azevedo](http://pt.linkedin.com/in/razevedoper/)
+######This implementation has been done within technology experimentation
+Fábio Gonçalves 
+[Ricardo Azevedo](http://pt.linkedin.com/in/razevedoper/)
 
 License (MIT)
 ===================
-Copyright (c) 2014 [Portugal Telecom Inovação](http://www.ptinovacao.pt)
+Copyright (c) 2014 [Portugal Telecom Inovação e Sistemas](http://www.ptinovacao.pt)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 

@@ -365,7 +365,11 @@ yes, there is another implementation [www.hoba.ie](https://hoba.ie/faq.html). We
 
 _for more questions and not to repeat what is already well described go here [www.hoba.ie/faq.html](https://hoba.ie/faq.html)_
 
-######This implementation has been done within technology experimentation
+
+Authors
+===================
+_This implementation has been done within Portugal Telecom Inovação e Sistemas under technology and new concept experimentations_
+
 Fábio Gonçalves 
 [Ricardo Azevedo](http://pt.linkedin.com/in/razevedoper/)
 
